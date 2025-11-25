@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, NavLink, useParams, Navigate } from 'react-router-dom'
-import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User } from 'lucide-react'
+import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Terminal, Globe, ShieldCheck, X, Check, Minus } from 'lucide-react'
 import clsx from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { supabase, signInWithGoogle, signOut, getGrants, getGrant, getResponses, updateResponse } from './lib/supabase'
@@ -108,6 +108,108 @@ function LandingPage() {
             </p>
           </div>
         </div>
+      </section>
+
+      {/* Why GrantKit */}
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <h2 className="text-3xl font-bold text-secondary-900 mb-4 text-center">Built different</h2>
+        <p className="text-secondary-600 text-center mb-12 max-w-2xl mx-auto">
+          Most grant tools are locked-in SaaS platforms. GrantKit combines the power of local AI tools with a collaborative web interface.
+        </p>
+
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="bg-gradient-to-br from-primary-50 to-white p-8 rounded-2xl border border-primary-100">
+            <div className="w-12 h-12 bg-primary-600 text-white rounded-xl flex items-center justify-center mb-4">
+              <Terminal className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-secondary-900 mb-2">Open Source + CLI</h3>
+            <p className="text-secondary-600">
+              Your proposals live in Git. Use Claude Code, Cursor, or any AI tool to craft responses locally. Full control over your data.
+            </p>
+          </div>
+          <div className="bg-gradient-to-br from-primary-50 to-white p-8 rounded-2xl border border-primary-100">
+            <div className="w-12 h-12 bg-primary-600 text-white rounded-xl flex items-center justify-center mb-4">
+              <Globe className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-secondary-900 mb-2">Web + Local Hybrid</h3>
+            <p className="text-secondary-600">
+              Edit in the web app for quick updates. Use your local editor for deep work. Changes sync automatically via Git.
+            </p>
+          </div>
+          <div className="bg-gradient-to-br from-primary-50 to-white p-8 rounded-2xl border border-primary-100">
+            <div className="w-12 h-12 bg-primary-600 text-white rounded-xl flex items-center justify-center mb-4">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-secondary-900 mb-2">Automated Validators</h3>
+            <p className="text-secondary-600">
+              NSF compliance checking built-in. Validate page limits, formatting rules, and required sections before submission.
+            </p>
+          </div>
+        </div>
+
+        {/* Comparison Table */}
+        <div className="bg-white rounded-2xl border border-secondary-200 overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-secondary-200 bg-secondary-50">
+                  <th className="text-left p-4 font-semibold text-secondary-900">Feature</th>
+                  <th className="text-center p-4 font-semibold text-primary-700 bg-primary-50">GrantKit</th>
+                  <th className="text-center p-4 font-semibold text-secondary-600">Instrumentl</th>
+                  <th className="text-center p-4 font-semibold text-secondary-600">GrantHub</th>
+                  <th className="text-center p-4 font-semibold text-secondary-600">Google Docs</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-secondary-100">
+                <tr>
+                  <td className="p-4 text-secondary-700">Open source</td>
+                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
+                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                </tr>
+                <tr className="bg-secondary-50/50">
+                  <td className="p-4 text-secondary-700">Local CLI + AI tools</td>
+                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
+                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-4 text-center"><Minus className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                </tr>
+                <tr>
+                  <td className="p-4 text-secondary-700">NSF compliance validation</td>
+                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
+                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                </tr>
+                <tr className="bg-secondary-50/50">
+                  <td className="p-4 text-secondary-700">Web collaboration</td>
+                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
+                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
+                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
+                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
+                </tr>
+                <tr>
+                  <td className="p-4 text-secondary-700">Grant discovery</td>
+                  <td className="p-4 text-center"><Minus className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
+                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
+                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                </tr>
+                <tr className="bg-secondary-50/50">
+                  <td className="p-4 text-secondary-700">Price</td>
+                  <td className="p-4 text-center font-semibold text-green-700">Free</td>
+                  <td className="p-4 text-center text-secondary-600">$179-299/mo</td>
+                  <td className="p-4 text-center text-secondary-600">$129-249/mo</td>
+                  <td className="p-4 text-center text-secondary-600">Free</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p className="text-center text-sm text-secondary-500 mt-4">
+          GrantHub is being discontinued in 2026. Instrumentl pricing from public site.
+        </p>
       </section>
 
       {/* Stats */}
