@@ -108,3 +108,84 @@ export const createResponse = async (response) => {
     .single()
   return { data, error }
 }
+
+// Public sharing helpers
+export const getGrantByShareToken = async (shareToken) => {
+  const { data, error } = await supabase
+    .from('grants')
+    .select('*')
+    .eq('share_token', shareToken)
+    .single()
+  return { data, error }
+}
+
+export const generateShareToken = async (grantId) => {
+  // Generate a random 32-char hex token
+  const token = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+
+  const { data, error } = await supabase
+    .from('grants')
+    .update({ share_token: token })
+    .eq('id', grantId)
+    .select()
+    .single()
+  return { data, error, token }
+}
+
+export const revokeShareToken = async (grantId) => {
+  const { data, error } = await supabase
+    .from('grants')
+    .update({ share_token: null })
+    .eq('id', grantId)
+    .select()
+    .single()
+  return { data, error }
+}
+
+// Internal documents helpers (letters, emails, budget - NOT shared publicly)
+export const getInternalDocuments = async (grantId) => {
+  const { data, error } = await supabase
+    .from('internal_documents')
+    .select('*')
+    .eq('grant_id', grantId)
+    .order('created_at', { ascending: false })
+  return { data, error }
+}
+
+export const getInternalDocument = async (id) => {
+  const { data, error } = await supabase
+    .from('internal_documents')
+    .select('*')
+    .eq('id', id)
+    .single()
+  return { data, error }
+}
+
+export const createInternalDocument = async (doc) => {
+  const { data, error } = await supabase
+    .from('internal_documents')
+    .insert(doc)
+    .select()
+    .single()
+  return { data, error }
+}
+
+export const updateInternalDocument = async (id, updates) => {
+  const { data, error } = await supabase
+    .from('internal_documents')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single()
+  return { data, error }
+}
+
+export const deleteInternalDocument = async (id) => {
+  const { error } = await supabase
+    .from('internal_documents')
+    .delete()
+    .eq('id', id)
+  return { error }
+}
