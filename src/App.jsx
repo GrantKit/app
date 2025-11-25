@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, NavLink, useParams, Navigate } from 'react-router-dom'
-import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Terminal, Globe, ShieldCheck, X, Check, Minus } from 'lucide-react'
+import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Terminal, Globe, ShieldCheck, X, Check, Minus, Download, Edit3, Shield, Upload, ArrowRight } from 'lucide-react'
 import clsx from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { supabase, signInWithGoogle, signOut, getGrants, getGrant, getResponses, updateResponse } from './lib/supabase'
@@ -37,7 +37,8 @@ function LandingPage() {
       <header className="border-b border-secondary-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo.jpeg" alt="GrantKit" className="h-10 w-auto" />
+            <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto" />
+            <span className="text-xl font-bold text-secondary-900">GrantKit</span>
           </div>
           <button
             onClick={handleGoogleSignIn}
@@ -51,13 +52,13 @@ function LandingPage() {
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-6 py-20 text-center">
+        <p className="text-sm font-semibold text-primary-600 mb-4 tracking-wide uppercase">For AI-native teams</p>
         <h1 className="text-5xl font-bold text-secondary-900 mb-6 tracking-tight">
-          Grant proposals,<br />
-          <span className="text-primary-600">organized</span>
+          You use AI agents for code.<br />
+          <span className="text-primary-600">Now use them for grants.</span>
         </h1>
         <p className="text-xl text-secondary-600 mb-10 max-w-2xl mx-auto">
-          Track deadlines, manage responses, collaborate with your team.
-          GrantKit helps nonprofits and research teams win more funding.
+          GrantKit syncs your proposals to local markdown files so Claude Code, Cursor, and other AI tools can help you write them. NSF validation built in.
         </p>
         <button
           onClick={handleGoogleSignIn}
@@ -73,7 +74,7 @@ function LandingPage() {
           {loading ? 'Signing in...' : 'Get started with Google'}
         </button>
         <p className="mt-4 text-sm text-secondary-500">
-          Currently available for PolicyEngine team members
+          Open source · Currently in beta
         </p>
       </section>
 
@@ -112,9 +113,9 @@ function LandingPage() {
 
       {/* Why GrantKit */}
       <section className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-secondary-900 mb-4 text-center">Built different</h2>
+        <h2 className="text-3xl font-bold text-secondary-900 mb-4 text-center">Why not just use Grantable?</h2>
         <p className="text-secondary-600 text-center mb-12 max-w-2xl mx-auto">
-          Most grant tools are locked-in SaaS platforms. GrantKit combines the power of local AI tools with a collaborative web interface.
+          Other grant tools have their own AI built in. But you already have Claude Code. GrantKit gets out of the way and lets your tools do the writing.
         </p>
 
         <div className="grid md:grid-cols-3 gap-8 mb-16">
@@ -156,7 +157,7 @@ function LandingPage() {
                   <th className="text-left p-4 font-semibold text-secondary-900">Feature</th>
                   <th className="text-center p-4 font-semibold text-primary-700 bg-primary-50">GrantKit</th>
                   <th className="text-center p-4 font-semibold text-secondary-600">Instrumentl</th>
-                  <th className="text-center p-4 font-semibold text-secondary-600">GrantHub</th>
+                  <th className="text-center p-4 font-semibold text-secondary-600">Grantable</th>
                   <th className="text-center p-4 font-semibold text-secondary-600">Google Docs</th>
                 </tr>
               </thead>
@@ -190,7 +191,7 @@ function LandingPage() {
                   <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
                 </tr>
                 <tr>
-                  <td className="p-4 text-secondary-700">Grant discovery</td>
+                  <td className="p-4 text-secondary-700">Built-in AI writing</td>
                   <td className="p-4 text-center"><Minus className="w-5 h-5 text-secondary-300 mx-auto" /></td>
                   <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
                   <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
@@ -200,7 +201,7 @@ function LandingPage() {
                   <td className="p-4 text-secondary-700">Price</td>
                   <td className="p-4 text-center font-semibold text-green-700">Free</td>
                   <td className="p-4 text-center text-secondary-600">$179-299/mo</td>
-                  <td className="p-4 text-center text-secondary-600">$129-249/mo</td>
+                  <td className="p-4 text-center text-secondary-600">$49-199/mo</td>
                   <td className="p-4 text-center text-secondary-600">Free</td>
                 </tr>
               </tbody>
@@ -208,8 +209,146 @@ function LandingPage() {
           </div>
         </div>
         <p className="text-center text-sm text-secondary-500 mt-4">
-          GrantHub is being discontinued in 2026. Instrumentl pricing from public site.
+          Pricing from public sites. GrantKit lets you use your own AI tools (Claude Code, Cursor, etc.) locally.
         </p>
+      </section>
+
+      {/* Workflow */}
+      <section className="bg-secondary-50 py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-secondary-900 mb-4 text-center">How it works</h2>
+          <p className="text-secondary-600 text-center mb-12 max-w-2xl mx-auto">
+            GrantKit syncs between local files and the cloud. Use AI tools locally, collaborate in the browser.
+          </p>
+
+          {/* Workflow Steps */}
+          <div className="grid md:grid-cols-4 gap-4 mb-12">
+            <div className="bg-white p-6 rounded-2xl border border-secondary-200 shadow-sm text-center">
+              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Download className="w-6 h-6" />
+              </div>
+              <div className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 1</div>
+              <h3 className="font-bold text-secondary-900 mb-2">Pull</h3>
+              <p className="text-sm text-secondary-600">Download grants to local markdown files</p>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-secondary-200 shadow-sm text-center">
+              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Edit3 className="w-6 h-6" />
+              </div>
+              <div className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 2</div>
+              <h3 className="font-bold text-secondary-900 mb-2">Edit</h3>
+              <p className="text-sm text-secondary-600">Use Claude Code, Cursor, or any AI tool</p>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-secondary-200 shadow-sm text-center">
+              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-6 h-6" />
+              </div>
+              <div className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 3</div>
+              <h3 className="font-bold text-secondary-900 mb-2">Validate</h3>
+              <p className="text-sm text-secondary-600">Check NSF compliance automatically</p>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-secondary-200 shadow-sm text-center">
+              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Upload className="w-6 h-6" />
+              </div>
+              <div className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 4</div>
+              <h3 className="font-bold text-secondary-900 mb-2">Push</h3>
+              <p className="text-sm text-secondary-600">Sync changes back to the cloud</p>
+            </div>
+          </div>
+
+          {/* Code Examples */}
+          <div className="bg-secondary-900 rounded-2xl p-8 shadow-xl">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="ml-4 text-secondary-400 text-sm font-mono">Terminal</span>
+            </div>
+            <div className="font-mono text-sm space-y-4">
+              <div>
+                <span className="text-secondary-500"># Install GrantKit CLI</span>
+                <div className="text-green-400">$ pip install grantkit</div>
+              </div>
+              <div>
+                <span className="text-secondary-500"># Pull grants from the cloud</span>
+                <div className="text-green-400">$ grantkit sync pull</div>
+                <div className="text-secondary-400 ml-2">✅ Pulled 10 grants, 94 responses</div>
+              </div>
+              <div>
+                <span className="text-secondary-500"># Edit with your favorite AI tool</span>
+                <div className="text-green-400">$ claude "improve the broader impacts section"</div>
+              </div>
+              <div>
+                <span className="text-secondary-500"># Validate NSF compliance</span>
+                <div className="text-green-400">$ grantkit validate</div>
+                <div className="text-secondary-400 ml-2">✅ All checks passed</div>
+              </div>
+              <div>
+                <span className="text-secondary-500"># Push changes back</span>
+                <div className="text-green-400">$ grantkit sync push</div>
+                <div className="text-secondary-400 ml-2">✅ Synced 3 responses to cloud</div>
+              </div>
+              <div>
+                <span className="text-secondary-500"># Or watch for changes and auto-sync</span>
+                <div className="text-green-400">$ grantkit sync watch</div>
+                <div className="text-secondary-400 ml-2">👀 Watching for changes...</div>
+              </div>
+            </div>
+          </div>
+
+          {/* File Structure */}
+          <div className="mt-12 grid md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="font-bold text-secondary-900 mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary-600" />
+                Local File Structure
+              </h3>
+              <div className="bg-white rounded-xl border border-secondary-200 p-6 font-mono text-sm">
+                <div className="text-secondary-600">
+                  <div>my-grants/</div>
+                  <div className="ml-4">├── nsf-cssi/</div>
+                  <div className="ml-8">├── grant.yaml</div>
+                  <div className="ml-8">└── responses/</div>
+                  <div className="ml-12">├── abstract.md</div>
+                  <div className="ml-12">├── broader_impacts.md</div>
+                  <div className="ml-12">└── technical_approach.md</div>
+                  <div className="ml-4">├── arnold-labor/</div>
+                  <div className="ml-4">└── ...</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3 className="font-bold text-secondary-900 mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary-600" />
+                Response Format (Markdown + YAML)
+              </h3>
+              <div className="bg-white rounded-xl border border-secondary-200 p-6 font-mono text-sm">
+                <div className="text-secondary-500">---</div>
+                <div><span className="text-primary-600">title:</span> <span className="text-secondary-700">Broader Impacts</span></div>
+                <div><span className="text-primary-600">key:</span> <span className="text-secondary-700">broader_impacts</span></div>
+                <div><span className="text-primary-600">word_limit:</span> <span className="text-secondary-700">2500</span></div>
+                <div><span className="text-primary-600">status:</span> <span className="text-secondary-700">draft</span></div>
+                <div className="text-secondary-500">---</div>
+                <div className="mt-2 text-secondary-700"># Broader Impacts</div>
+                <div className="text-secondary-600 mt-1">PolicyEngine democratizes...</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <a
+              href="https://github.com/GrantKit/grantkit"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-secondary-900 text-white rounded-xl font-semibold hover:bg-secondary-800 transition-colors"
+            >
+              <Terminal className="w-5 h-5" />
+              View CLI on GitHub
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
       </section>
 
       {/* Stats */}
@@ -238,8 +377,8 @@ function LandingPage() {
 
       {/* CTA */}
       <section className="max-w-6xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-bold text-secondary-900 mb-4">Ready to get organized?</h2>
-        <p className="text-secondary-600 mb-8">Sign in with your PolicyEngine Google account to access your grants.</p>
+        <h2 className="text-3xl font-bold text-secondary-900 mb-4">Let your AI agent write your next grant</h2>
+        <p className="text-secondary-600 mb-8">Sign in to try GrantKit. Currently in beta for PolicyEngine team.</p>
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
@@ -259,7 +398,8 @@ function LandingPage() {
       <footer className="border-t border-secondary-100 py-8">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-sm text-secondary-500">
           <div className="flex items-center gap-2">
-            <img src="/logo.jpeg" alt="GrantKit" className="h-6 w-auto" />
+            <img src="/logo-icon.jpeg" alt="GrantKit" className="h-8 w-auto" />
+            <span className="font-semibold text-secondary-700">GrantKit</span>
           </div>
           <div>
             <a href="https://github.com/GrantKit" className="hover:text-secondary-700 transition-colors">GitHub</a>
@@ -641,9 +781,10 @@ function App() {
         <aside className="w-80 bg-white border-r border-secondary-200 h-screen fixed overflow-y-auto hidden md:flex flex-col z-20 shadow-sm">
           <div className="p-6 border-b border-secondary-100 sticky top-0 bg-white/95 backdrop-blur z-10">
             <div className="flex items-center gap-3 mb-1">
-              <img src="/logo.jpeg" alt="GrantKit" className="h-10 w-auto" />
+              <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto" />
+              <span className="text-xl font-bold text-secondary-900">GrantKit</span>
             </div>
-            <p className="text-xs text-secondary-500 font-semibold tracking-wider uppercase">Grant Applications</p>
+            <p className="text-xs text-secondary-500 font-semibold tracking-wider uppercase ml-1">Grant Applications</p>
           </div>
 
           <nav className="p-4 space-y-1 flex-1">
