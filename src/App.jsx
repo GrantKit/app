@@ -1192,10 +1192,14 @@ function AuthenticatedApp({ session, onSignOut }) {
       {/* Sidebar */}
       <aside className="w-80 bg-white border-r border-secondary-200 h-screen fixed overflow-y-auto hidden md:flex flex-col z-20 shadow-sm">
         <div className="p-6 border-b border-secondary-100 sticky top-0 bg-white/95 backdrop-blur z-10">
-          <div className="flex items-center gap-3 mb-1">
+          <button
+            onClick={onSignOut}
+            className="flex items-center gap-3 mb-1 hover:opacity-80 transition-opacity"
+            title="Back to home"
+          >
             <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto" />
             <span className="text-xl font-bold text-secondary-900">GrantKit</span>
-          </div>
+          </button>
           <p className="text-xs text-secondary-500 font-semibold tracking-wider uppercase ml-1">Grant Applications</p>
         </div>
 
