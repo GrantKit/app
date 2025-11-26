@@ -1170,8 +1170,10 @@ function PublicGrantView() {
   )
 }
 
-// Dev mode - bypass auth for localhost
-const DEV_MODE = window.location.hostname === 'localhost'
+// Domain configuration
+const hostname = window.location.hostname
+const DEV_MODE = hostname === 'localhost'
+const isMarketingDomain = hostname === 'grantkit.io'
 
 
 // Authenticated app content
@@ -1193,14 +1195,14 @@ function AuthenticatedApp({ session, onSignOut }) {
       {/* Sidebar */}
       <aside className="w-80 bg-white border-r border-secondary-200 h-screen fixed overflow-y-auto hidden md:flex flex-col z-20 shadow-sm">
         <div className="p-6 border-b border-secondary-100 sticky top-0 bg-white/95 backdrop-blur z-10">
-          <NavLink
-            to="/home"
+          <a
+            href="https://grantkit.io"
             className="flex items-center gap-3 mb-1 hover:opacity-80 transition-opacity"
             title="GrantKit home"
           >
             <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto" />
             <span className="text-xl font-bold text-secondary-900">GrantKit</span>
-          </NavLink>
+          </a>
           <p className="text-xs text-secondary-500 font-semibold tracking-wider uppercase ml-1">Grant Applications</p>
         </div>
 
@@ -1292,24 +1294,28 @@ function App() {
     await signOut()
   }
 
+  // Marketing domain (grantkit.io) always shows landing page
+  // App domain (app.grantkit.io) shows the authenticated app
   return (
     <Router>
       <Routes>
-        {/* Public share route - no auth required */}
+        {/* Public share route - works on both domains */}
         <Route path="/share/:shareToken" element={<PublicGrantView />} />
 
-        {/* Landing page route - always shows landing regardless of auth */}
-        <Route path="/home" element={<LandingPage />} />
-
-        {/* All other routes require auth check */}
+        {/* All other routes depend on domain */}
         <Route path="*" element={
           loading ? (
             <div className="min-h-screen flex items-center justify-center bg-secondary-50">
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-200 border-t-primary-600"></div>
             </div>
+          ) : isMarketingDomain ? (
+            // grantkit.io always shows landing page
+            <LandingPage />
           ) : !session ? (
+            // app.grantkit.io without session shows landing
             <LandingPage />
           ) : (
+            // app.grantkit.io with session shows app
             <AuthenticatedApp session={session} onSignOut={handleSignOut} />
           )
         } />

@@ -15,10 +15,15 @@ export const signInWithEmail = async (email, password) => {
 }
 
 export const signInWithGoogle = async () => {
+  // Always redirect to app subdomain after OAuth
+  const redirectUrl = window.location.hostname === 'localhost'
+    ? window.location.origin
+    : 'https://app.grantkit.io'
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: window.location.origin,
+      redirectTo: redirectUrl,
     },
   })
   return { data, error }
