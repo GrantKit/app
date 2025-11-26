@@ -1268,6 +1268,65 @@ function AuthenticatedApp({ session, onSignOut }) {
   )
 }
 
+// Waitlist page for non-PolicyEngine users
+function WaitlistPage({ email, onSignOut }) {
+  const [submitted, setSubmitted] = useState(false)
+
+  const handleJoinWaitlist = async () => {
+    // Store email in waitlist (we'll add the table)
+    try {
+      await supabase.from('waitlist').insert({ email })
+    } catch (e) {
+      // Ignore errors (might already exist)
+    }
+    setSubmitted(true)
+    // Sign them out after a delay
+    setTimeout(() => {
+      onSignOut()
+    }, 3000)
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-secondary-50 to-white flex items-center justify-center p-6">
+      <div className="max-w-md w-full bg-white rounded-2xl border border-secondary-200 shadow-lg p-8 text-center">
+        <div className="w-16 h-16 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Mail className="w-8 h-8" />
+        </div>
+        <h1 className="text-2xl font-bold text-secondary-900 mb-3">
+          Thanks for your interest!
+        </h1>
+        <p className="text-secondary-600 mb-6">
+          GrantKit is currently in private beta. We'll notify you at <strong>{email}</strong> when we open up access.
+        </p>
+        {!submitted ? (
+          <button
+            onClick={handleJoinWaitlist}
+            className="w-full px-6 py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors"
+          >
+            Join the waitlist
+          </button>
+        ) : (
+          <div className="flex items-center justify-center gap-2 text-green-600 font-medium">
+            <Check className="w-5 h-5" />
+            You're on the list!
+          </div>
+        )}
+        <button
+          onClick={onSignOut}
+          className="mt-4 text-sm text-secondary-500 hover:text-secondary-700"
+        >
+          Sign out
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Check if email is allowed (PolicyEngine domain)
+const isAllowedEmail = (email) => {
+  return email?.endsWith('@policyengine.org')
+}
+
 // Main App
 function App() {
   const [session, setSession] = useState(DEV_MODE ? { user: { email: 'dev@localhost' } } : null)
@@ -1314,8 +1373,11 @@ function App() {
           ) : !session ? (
             // app.grantkit.io without session shows landing
             <LandingPage />
+          ) : !isAllowedEmail(session.user?.email) ? (
+            // Non-PolicyEngine users see waitlist
+            <WaitlistPage email={session.user?.email} onSignOut={handleSignOut} />
           ) : (
-            // app.grantkit.io with session shows app
+            // PolicyEngine users with session see the app
             <AuthenticatedApp session={session} onSignOut={handleSignOut} />
           )
         } />
