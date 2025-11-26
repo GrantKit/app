@@ -1173,6 +1173,7 @@ function PublicGrantView() {
 // Dev mode - bypass auth for localhost
 const DEV_MODE = window.location.hostname === 'localhost'
 
+
 // Authenticated app content
 function AuthenticatedApp({ session, onSignOut }) {
   const [grants, setGrants] = useState([])
@@ -1192,14 +1193,14 @@ function AuthenticatedApp({ session, onSignOut }) {
       {/* Sidebar */}
       <aside className="w-80 bg-white border-r border-secondary-200 h-screen fixed overflow-y-auto hidden md:flex flex-col z-20 shadow-sm">
         <div className="p-6 border-b border-secondary-100 sticky top-0 bg-white/95 backdrop-blur z-10">
-          <button
-            onClick={onSignOut}
+          <NavLink
+            to="/home"
             className="flex items-center gap-3 mb-1 hover:opacity-80 transition-opacity"
-            title="Back to home"
+            title="GrantKit home"
           >
             <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto" />
             <span className="text-xl font-bold text-secondary-900">GrantKit</span>
-          </button>
+          </NavLink>
           <p className="text-xs text-secondary-500 font-semibold tracking-wider uppercase ml-1">Grant Applications</p>
         </div>
 
@@ -1291,12 +1292,14 @@ function App() {
     await signOut()
   }
 
-  // Router wraps everything so public routes work
   return (
     <Router>
       <Routes>
         {/* Public share route - no auth required */}
         <Route path="/share/:shareToken" element={<PublicGrantView />} />
+
+        {/* Landing page route - always shows landing regardless of auth */}
+        <Route path="/home" element={<LandingPage />} />
 
         {/* All other routes require auth check */}
         <Route path="*" element={
