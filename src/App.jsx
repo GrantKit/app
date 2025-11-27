@@ -22,395 +22,6 @@ const copyToClipboard = async (text) => {
   }
 }
 
-// Landing page component
-function LandingPage() {
-  const [loading, setLoading] = useState(false)
-
-  const handleGoogleSignIn = async () => {
-    setLoading(true)
-    await signInWithGoogle()
-    setLoading(false)
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-secondary-50 to-white">
-      {/* Header */}
-      <header className="border-b border-secondary-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto" />
-            <span className="text-xl font-bold text-secondary-900">GrantKit</span>
-          </div>
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
-          >
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 py-20 text-center">
-        <p className="text-sm font-semibold text-primary-600 mb-4 tracking-wide uppercase">For AI-native teams</p>
-        <h1 className="text-5xl font-bold text-secondary-900 mb-6 tracking-tight">
-          You use AI agents for code.<br />
-          <span className="text-primary-600">Now use them for grants.</span>
-        </h1>
-        <p className="text-xl text-secondary-600 mb-10 max-w-2xl mx-auto">
-          GrantKit syncs your proposals to local markdown files so Claude Code, Cursor, and other AI tools can help you write them. NSF validation built in.
-        </p>
-        <button
-          onClick={handleGoogleSignIn}
-          disabled={loading}
-          className="inline-flex items-center gap-3 px-8 py-4 bg-primary-600 text-white rounded-xl font-semibold text-lg hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/30"
-        >
-          <svg className="w-6 h-6" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          {loading ? 'Signing in...' : 'Get started with Google'}
-        </button>
-        <p className="mt-4 text-sm text-secondary-500">
-          Open source · Currently in beta
-        </p>
-      </section>
-
-      {/* Features */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-white p-8 rounded-2xl border border-secondary-200 shadow-sm">
-            <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center mb-4">
-              <FileText className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-secondary-900 mb-2">Track Applications</h3>
-            <p className="text-secondary-600">
-              Keep all your grant applications in one place. See deadlines, status, and requested amounts at a glance.
-            </p>
-          </div>
-          <div className="bg-white p-8 rounded-2xl border border-secondary-200 shadow-sm">
-            <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center mb-4">
-              <CheckCircle className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-secondary-900 mb-2">Manage Responses</h3>
-            <p className="text-secondary-600">
-              Edit and track progress on each response. Word counts, character limits, and completion status built in.
-            </p>
-          </div>
-          <div className="bg-white p-8 rounded-2xl border border-secondary-200 shadow-sm">
-            <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center mb-4">
-              <User className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-secondary-900 mb-2">Team Collaboration</h3>
-            <p className="text-secondary-600">
-              Everyone on your team can access and edit grants. No more version conflicts or email chains.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Why GrantKit */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-secondary-900 mb-4 text-center">Why not just use Grantable?</h2>
-        <p className="text-secondary-600 text-center mb-12 max-w-2xl mx-auto">
-          Other grant tools have their own AI built in. But you already have Claude Code. GrantKit gets out of the way and lets your tools do the writing.
-        </p>
-
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-gradient-to-br from-primary-50 to-white p-8 rounded-2xl border border-primary-100">
-            <div className="w-12 h-12 bg-primary-600 text-white rounded-xl flex items-center justify-center mb-4">
-              <Terminal className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-secondary-900 mb-2">Open Source + CLI</h3>
-            <p className="text-secondary-600">
-              Your proposals live in Git. Use Claude Code, Cursor, or any AI tool to craft responses locally. Full control over your data.
-            </p>
-          </div>
-          <div className="bg-gradient-to-br from-primary-50 to-white p-8 rounded-2xl border border-primary-100">
-            <div className="w-12 h-12 bg-primary-600 text-white rounded-xl flex items-center justify-center mb-4">
-              <Globe className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-secondary-900 mb-2">Web + Local Hybrid</h3>
-            <p className="text-secondary-600">
-              Edit in the web app for quick updates. Use your local editor for deep work. Changes sync automatically via Git.
-            </p>
-          </div>
-          <div className="bg-gradient-to-br from-primary-50 to-white p-8 rounded-2xl border border-primary-100">
-            <div className="w-12 h-12 bg-primary-600 text-white rounded-xl flex items-center justify-center mb-4">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-secondary-900 mb-2">Automated Validators</h3>
-            <p className="text-secondary-600">
-              NSF compliance checking built-in. Validate page limits, formatting rules, and required sections before submission.
-            </p>
-          </div>
-        </div>
-
-        {/* Comparison Table */}
-        <div className="bg-white rounded-2xl border border-secondary-200 overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-secondary-200 bg-secondary-50">
-                  <th className="text-left p-4 font-semibold text-secondary-900">Feature</th>
-                  <th className="text-center p-4 font-semibold text-primary-700 bg-primary-50">GrantKit</th>
-                  <th className="text-center p-4 font-semibold text-secondary-600">Instrumentl</th>
-                  <th className="text-center p-4 font-semibold text-secondary-600">Grantable</th>
-                  <th className="text-center p-4 font-semibold text-secondary-600">Google Docs</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-secondary-100">
-                <tr>
-                  <td className="p-4 text-secondary-700">Open source</td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                </tr>
-                <tr className="bg-secondary-50/50">
-                  <td className="p-4 text-secondary-700">Local CLI + AI tools</td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><Minus className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                </tr>
-                <tr>
-                  <td className="p-4 text-secondary-700">NSF compliance validation</td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                </tr>
-                <tr className="bg-secondary-50/50">
-                  <td className="p-4 text-secondary-700">Web collaboration</td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                </tr>
-                <tr>
-                  <td className="p-4 text-secondary-700">Built-in AI writing</td>
-                  <td className="p-4 text-center"><Minus className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                </tr>
-                <tr className="bg-secondary-50/50">
-                  <td className="p-4 text-secondary-700">Price</td>
-                  <td className="p-4 text-center font-semibold text-green-700">Free</td>
-                  <td className="p-4 text-center text-secondary-600">$179-299/mo</td>
-                  <td className="p-4 text-center text-secondary-600">$49-199/mo</td>
-                  <td className="p-4 text-center text-secondary-600">Free</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <p className="text-center text-sm text-secondary-500 mt-4">
-          Pricing from public sites. GrantKit lets you use your own AI tools (Claude Code, Cursor, etc.) locally.
-        </p>
-      </section>
-
-      {/* Workflow */}
-      <section className="bg-secondary-50 py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-secondary-900 mb-4 text-center">How it works</h2>
-          <p className="text-secondary-600 text-center mb-12 max-w-2xl mx-auto">
-            GrantKit syncs between local files and the cloud. Use AI tools locally, collaborate in the browser.
-          </p>
-
-          {/* Workflow Steps */}
-          <div className="grid md:grid-cols-4 gap-4 mb-12">
-            <div className="bg-white p-6 rounded-2xl border border-secondary-200 shadow-sm text-center">
-              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Download className="w-6 h-6" />
-              </div>
-              <div className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 1</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Pull</h3>
-              <p className="text-sm text-secondary-600">Download grants to local markdown files</p>
-            </div>
-            <div className="bg-white p-6 rounded-2xl border border-secondary-200 shadow-sm text-center">
-              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Edit3 className="w-6 h-6" />
-              </div>
-              <div className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 2</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Edit</h3>
-              <p className="text-sm text-secondary-600">Use Claude Code, Cursor, or any AI tool</p>
-            </div>
-            <div className="bg-white p-6 rounded-2xl border border-secondary-200 shadow-sm text-center">
-              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-6 h-6" />
-              </div>
-              <div className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 3</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Validate</h3>
-              <p className="text-sm text-secondary-600">Check NSF compliance automatically</p>
-            </div>
-            <div className="bg-white p-6 rounded-2xl border border-secondary-200 shadow-sm text-center">
-              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Upload className="w-6 h-6" />
-              </div>
-              <div className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 4</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Push</h3>
-              <p className="text-sm text-secondary-600">Sync changes back to the cloud</p>
-            </div>
-          </div>
-
-          {/* Code Examples */}
-          <div className="bg-secondary-900 rounded-2xl p-8 shadow-xl">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <span className="ml-4 text-secondary-400 text-sm font-mono">Terminal</span>
-            </div>
-            <div className="font-mono text-sm space-y-4">
-              <div>
-                <span className="text-secondary-500"># Install GrantKit CLI</span>
-                <div className="text-green-400">$ pip install grantkit</div>
-              </div>
-              <div>
-                <span className="text-secondary-500"># Pull grants from the cloud</span>
-                <div className="text-green-400">$ grantkit sync pull</div>
-                <div className="text-secondary-400 ml-2">✅ Pulled 10 grants, 94 responses</div>
-              </div>
-              <div>
-                <span className="text-secondary-500"># Edit with your favorite AI tool</span>
-                <div className="text-green-400">$ claude "improve the broader impacts section"</div>
-              </div>
-              <div>
-                <span className="text-secondary-500"># Validate NSF compliance</span>
-                <div className="text-green-400">$ grantkit validate</div>
-                <div className="text-secondary-400 ml-2">✅ All checks passed</div>
-              </div>
-              <div>
-                <span className="text-secondary-500"># Push changes back</span>
-                <div className="text-green-400">$ grantkit sync push</div>
-                <div className="text-secondary-400 ml-2">✅ Synced 3 responses to cloud</div>
-              </div>
-              <div>
-                <span className="text-secondary-500"># Or watch for changes and auto-sync</span>
-                <div className="text-green-400">$ grantkit sync watch</div>
-                <div className="text-secondary-400 ml-2">👀 Watching for changes...</div>
-              </div>
-            </div>
-          </div>
-
-          {/* File Structure */}
-          <div className="mt-12 grid md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="font-bold text-secondary-900 mb-4 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary-600" />
-                Local File Structure
-              </h3>
-              <div className="bg-white rounded-xl border border-secondary-200 p-6 font-mono text-sm">
-                <div className="text-secondary-600">
-                  <div>my-grants/</div>
-                  <div className="ml-4">├── nsf-cssi/</div>
-                  <div className="ml-8">├── grant.yaml</div>
-                  <div className="ml-8">└── responses/</div>
-                  <div className="ml-12">├── abstract.md</div>
-                  <div className="ml-12">├── broader_impacts.md</div>
-                  <div className="ml-12">└── technical_approach.md</div>
-                  <div className="ml-4">├── arnold-labor/</div>
-                  <div className="ml-4">└── ...</div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-bold text-secondary-900 mb-4 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary-600" />
-                Response Format (Markdown + YAML)
-              </h3>
-              <div className="bg-white rounded-xl border border-secondary-200 p-6 font-mono text-sm">
-                <div className="text-secondary-500">---</div>
-                <div><span className="text-primary-600">title:</span> <span className="text-secondary-700">Broader Impacts</span></div>
-                <div><span className="text-primary-600">key:</span> <span className="text-secondary-700">broader_impacts</span></div>
-                <div><span className="text-primary-600">word_limit:</span> <span className="text-secondary-700">2500</span></div>
-                <div><span className="text-primary-600">status:</span> <span className="text-secondary-700">draft</span></div>
-                <div className="text-secondary-500">---</div>
-                <div className="mt-2 text-secondary-700"># Broader Impacts</div>
-                <div className="text-secondary-600 mt-1">PolicyEngine democratizes...</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center mt-12">
-            <a
-              href="https://github.com/GrantKit/grantkit"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-secondary-900 text-white rounded-xl font-semibold hover:bg-secondary-800 transition-colors"
-            >
-              <Terminal className="w-5 h-5" />
-              View CLI on GitHub
-              <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="bg-secondary-900 py-16">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-white mb-2">$4.9M</div>
-              <div className="text-secondary-400">Total Requested</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white mb-2">10</div>
-              <div className="text-secondary-400">Active Grants</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white mb-2">94</div>
-              <div className="text-secondary-400">Response Sections</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white mb-2">8</div>
-              <div className="text-secondary-400">Foundations</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="max-w-6xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-bold text-secondary-900 mb-4">Let your AI agent write your next grant</h2>
-        <p className="text-secondary-600 mb-8">Sign in to try GrantKit. Currently in beta for PolicyEngine team.</p>
-        <button
-          onClick={handleGoogleSignIn}
-          disabled={loading}
-          className="inline-flex items-center gap-3 px-6 py-3 bg-white border-2 border-secondary-200 text-secondary-700 rounded-xl font-semibold hover:bg-secondary-50 transition-colors"
-        >
-          <svg className="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          {loading ? 'Signing in...' : 'Sign in with Google'}
-        </button>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-secondary-100 py-8">
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-sm text-secondary-500">
-          <div className="flex items-center gap-2">
-            <img src="/logo-icon.jpeg" alt="GrantKit" className="h-8 w-auto" />
-            <span className="font-semibold text-secondary-700">GrantKit</span>
-          </div>
-          <div>
-            <a href="https://github.com/GrantKit" className="hover:text-secondary-700 transition-colors">GitHub</a>
-          </div>
-        </div>
-      </footer>
-    </div>
-  )
-}
-
 // Response card component
 function ResponseCard({ response, onUpdate }) {
   const [copied, setCopied] = useState(false)
@@ -1197,8 +808,51 @@ function PublicGrantView() {
 // Domain configuration
 const hostname = window.location.hostname
 const DEV_MODE = hostname === 'localhost'
-const isMarketingDomain = hostname === 'grantkit.io'
+const isMarketingDomain = hostname === 'grantkit.io' || hostname === 'www.grantkit.io'
 
+// Redirect marketing domain to static website
+if (isMarketingDomain && typeof window !== 'undefined') {
+  window.location.replace('https://grantkit.io')
+}
+
+// Simple login page for app.grantkit.io
+function LoginPage() {
+  const [loading, setLoading] = useState(false)
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true)
+    await signInWithGoogle()
+    setLoading(false)
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-secondary-50 to-white flex items-center justify-center p-6">
+      <div className="max-w-md w-full bg-white rounded-2xl border border-secondary-200 shadow-lg p-8 text-center">
+        <img src="/logo-icon.jpeg" alt="GrantKit" className="h-16 w-auto mx-auto mb-6" />
+        <h1 className="text-2xl font-bold text-secondary-900 mb-2">Welcome to GrantKit</h1>
+        <p className="text-secondary-600 mb-8">
+          Sign in to manage your grant applications.
+        </p>
+        <button
+          onClick={handleGoogleSignIn}
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          {loading ? 'Signing in...' : 'Sign in with Google'}
+        </button>
+        <p className="mt-6 text-sm text-secondary-500">
+          <a href="https://grantkit.io" className="text-primary-600 hover:underline">Learn more about GrantKit</a>
+        </p>
+      </div>
+    </div>
+  )
+}
 
 // Authenticated app content
 function AuthenticatedApp({ session, onSignOut }) {
@@ -1592,18 +1246,15 @@ function App() {
         {/* CLI device auth route */}
         <Route path="/auth/device" element={<DeviceAuthPage />} />
 
-        {/* All other routes depend on domain */}
+        {/* All other routes depend on auth state */}
         <Route path="*" element={
           loading ? (
             <div className="min-h-screen flex items-center justify-center bg-secondary-50">
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-200 border-t-primary-600"></div>
             </div>
-          ) : isMarketingDomain ? (
-            // grantkit.io always shows landing page
-            <LandingPage />
           ) : !session ? (
-            // app.grantkit.io without session shows landing
-            <LandingPage />
+            // Not logged in - show login page
+            <LoginPage />
           ) : !isAllowedEmail(session.user?.email) ? (
             // Non-PolicyEngine users see waitlist
             <WaitlistPage email={session.user?.email} onSignOut={handleSignOut} />
