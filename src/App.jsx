@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, NavLink, useParams, Navigate } from 'react-router-dom'
-import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Terminal, Globe, ShieldCheck, X, Check, Minus, Download, Edit3, Shield, Upload, ArrowRight, Share2, Link, Mail, FileKey, Plus, Trash2, Send } from 'lucide-react'
+import { BrowserRouter as Router, Routes, Route, NavLink, useParams, Navigate, useNavigate } from 'react-router-dom'
+import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Terminal, Globe, ShieldCheck, X, Check, Minus, Download, Edit3, Shield, Upload, ArrowRight, Share2, Link, Mail, FileKey, Plus, Trash2, Send, Archive, RotateCcw } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import clsx from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { supabase, signInWithGoogle, signOut, getGrants, getGrant, getResponses, updateResponse, getGrantByShareToken, generateShareToken, getInternalDocuments, createInternalDocument, updateInternalDocument, deleteInternalDocument, completeDeviceAuth } from './lib/supabase'
+import { supabase, signInWithGoogle, signOut, getGrant, getResponses, updateResponse, getGrantByShareToken, generateShareToken, getInternalDocuments, createInternalDocument, updateInternalDocument, deleteInternalDocument, completeDeviceAuth, archiveGrant, restoreGrant, getActiveGrants, getArchivedGrants } from './lib/supabase'
 
 // Utility for class merging
 function cn(...inputs) {
@@ -761,8 +761,9 @@ function InternalDocumentCard({ doc, onUpdate, onDelete }) {
 }
 
 // Grant detail view
-function GrantDetail() {
+function GrantDetail({ onArchive, onRestore, showArchived }) {
   const { grantId } = useParams()
+  const navigate = useNavigate()
   const [grant, setGrant] = useState(null)
   const [responses, setResponses] = useState([])
   const [internalDocs, setInternalDocs] = useState([])
@@ -882,6 +883,29 @@ function GrantDetail() {
             </div>
           </div>
           <div className="flex gap-3 self-start">
+            {showArchived ? (
+              <button
+                onClick={() => {
+                  onRestore(grantId)
+                  navigate('/')
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-medium text-sm hover:bg-green-700 transition-all"
+              >
+                <RotateCcw size={16} /> Restore
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  if (window.confirm('Archive this grant? You can restore it later.')) {
+                    onArchive(grantId, 'other')
+                    navigate('/')
+                  }
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-secondary-100 text-secondary-700 rounded-lg font-medium text-sm hover:bg-secondary-200 transition-all"
+              >
+                <Archive size={16} /> Archive
+              </button>
+            )}
             <button
               onClick={handleShare}
               className={cn(
@@ -1179,14 +1203,30 @@ const isMarketingDomain = hostname === 'grantkit.io'
 // Authenticated app content
 function AuthenticatedApp({ session, onSignOut }) {
   const [grants, setGrants] = useState([])
+  const [showArchived, setShowArchived] = useState(false)
 
   useEffect(() => {
-    async function loadGrants() {
-      const { data } = await getGrants()
+    const loadGrants = async () => {
+      const { data } = showArchived ? await getArchivedGrants() : await getActiveGrants()
       setGrants(data || [])
     }
     loadGrants()
-  }, [])
+  }, [showArchived])
+
+  const refreshGrants = async () => {
+    const { data } = showArchived ? await getArchivedGrants() : await getActiveGrants()
+    setGrants(data || [])
+  }
+
+  const handleArchive = async (grantId, reason = 'other') => {
+    await archiveGrant(grantId, reason)
+    refreshGrants()
+  }
+
+  const handleRestore = async (grantId) => {
+    await restoreGrant(grantId, 'draft')
+    refreshGrants()
+  }
 
   const defaultGrant = grants.length > 0 ? grants[0].id : null
 
@@ -1204,6 +1244,30 @@ function AuthenticatedApp({ session, onSignOut }) {
             <span className="text-xl font-bold text-secondary-900">GrantKit</span>
           </a>
           <p className="text-xs text-secondary-500 font-semibold tracking-wider uppercase ml-1">Grant Applications</p>
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={() => setShowArchived(false)}
+              className={cn(
+                "flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
+                !showArchived
+                  ? "bg-primary-100 text-primary-700"
+                  : "text-secondary-500 hover:bg-secondary-100"
+              )}
+            >
+              Active
+            </button>
+            <button
+              onClick={() => setShowArchived(true)}
+              className={cn(
+                "flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
+                showArchived
+                  ? "bg-primary-100 text-primary-700"
+                  : "text-secondary-500 hover:bg-secondary-100"
+              )}
+            >
+              Archived
+            </button>
+          </div>
         </div>
 
         <nav className="p-3 flex-1">
@@ -1260,7 +1324,7 @@ function AuthenticatedApp({ session, onSignOut }) {
         <div className="max-w-7xl mx-auto p-6 md:p-10 lg:p-12">
           <Routes>
             <Route path="/" element={defaultGrant ? <Navigate to={`/${defaultGrant}`} replace /> : <div className="text-center py-20 text-secondary-400">No grants yet</div>} />
-            <Route path="/:grantId" element={<GrantDetail />} />
+            <Route path="/:grantId" element={<GrantDetail onArchive={handleArchive} onRestore={handleRestore} showArchived={showArchived} />} />
           </Routes>
         </div>
       </main>

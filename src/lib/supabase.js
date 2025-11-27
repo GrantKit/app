@@ -85,6 +85,53 @@ export const deleteGrant = async (id) => {
   return { error }
 }
 
+// Archive helpers
+export const archiveGrant = async (id, reason = 'other') => {
+  const { data, error } = await supabase
+    .from('grants')
+    .update({
+      archived_at: new Date().toISOString(),
+      archived_reason: reason,
+      status: 'archived'
+    })
+    .eq('id', id)
+    .select()
+    .single()
+  return { data, error }
+}
+
+export const restoreGrant = async (id, newStatus = 'draft') => {
+  const { data, error } = await supabase
+    .from('grants')
+    .update({
+      archived_at: null,
+      archived_reason: null,
+      status: newStatus
+    })
+    .eq('id', id)
+    .select()
+    .single()
+  return { data, error }
+}
+
+export const getArchivedGrants = async () => {
+  const { data, error } = await supabase
+    .from('grants')
+    .select('*')
+    .not('archived_at', 'is', null)
+    .order('archived_at', { ascending: false })
+  return { data, error }
+}
+
+export const getActiveGrants = async () => {
+  const { data, error } = await supabase
+    .from('grants')
+    .select('*')
+    .is('archived_at', null)
+    .order('deadline', { ascending: true })
+  return { data, error }
+}
+
 // Responses helpers
 export const getResponses = async (grantId) => {
   const { data, error } = await supabase
