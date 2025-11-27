@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, NavLink, useParams, Navigate, useNavigate } from 'react-router-dom'
-import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Terminal, Globe, ShieldCheck, X, Check, Minus, Download, Edit3, Shield, Upload, ArrowRight, Share2, Link, Mail, FileKey, Plus, Trash2, Send, Archive, RotateCcw } from 'lucide-react'
+import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Terminal, Globe, ShieldCheck, X, Check, Minus, Download, Edit3, Shield, Upload, ArrowRight, Share2, Link, Mail, FileKey, Plus, Trash2, Send, Archive, RotateCcw, Menu } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import clsx from 'clsx'
 import { twMerge } from 'tailwind-merge'
@@ -858,6 +858,7 @@ function LoginPage() {
 function AuthenticatedApp({ session, onSignOut }) {
   const [grants, setGrants] = useState([])
   const [showArchived, setShowArchived] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     const loadGrants = async () => {
@@ -886,7 +887,106 @@ function AuthenticatedApp({ session, onSignOut }) {
 
   return (
     <div className="min-h-screen bg-secondary-50 font-sans text-secondary-900 flex">
-      {/* Sidebar */}
+      {/* Mobile Header */}
+      <header className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-secondary-200 z-30 px-4 py-3 flex items-center justify-between">
+        <button
+          onClick={() => setMobileMenuOpen(true)}
+          className="p-2 -ml-2 text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100 rounded-lg"
+        >
+          <Menu size={24} />
+        </button>
+        <a href="https://grantkit.io" className="flex items-center gap-2">
+          <img src="/logo-icon.jpeg" alt="GrantKit" className="h-8 w-auto" />
+          <span className="font-bold text-secondary-900">GrantKit</span>
+        </a>
+        <div className="w-10" /> {/* Spacer for centering */}
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Slide-out Menu */}
+      <aside className={cn(
+        "md:hidden fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-50 transform transition-transform duration-300 overflow-y-auto",
+        mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="p-4 border-b border-secondary-100 flex items-center justify-between">
+          <a href="https://grantkit.io" className="flex items-center gap-2">
+            <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto" />
+            <span className="text-xl font-bold text-secondary-900">GrantKit</span>
+          </a>
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="p-2 text-secondary-500 hover:text-secondary-900"
+          >
+            <X size={24} />
+          </button>
+        </div>
+        <div className="p-4 border-b border-secondary-100">
+          <p className="text-xs text-secondary-500 font-semibold tracking-wider uppercase mb-3">Grant Applications</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowArchived(false)}
+              className={cn(
+                "flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
+                !showArchived ? "bg-primary-100 text-primary-700" : "text-secondary-500 hover:bg-secondary-100"
+              )}
+            >
+              Active
+            </button>
+            <button
+              onClick={() => setShowArchived(true)}
+              className={cn(
+                "flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
+                showArchived ? "bg-primary-100 text-primary-700" : "text-secondary-500 hover:bg-secondary-100"
+              )}
+            >
+              Archived
+            </button>
+          </div>
+        </div>
+        <nav className="p-3">
+          {grants.map((grant) => (
+            <NavLink
+              key={grant.id}
+              to={`/${grant.id}`}
+              onClick={() => setMobileMenuOpen(false)}
+              className={({ isActive }) =>
+                cn(
+                  "block px-3 py-2.5 rounded-lg text-sm transition-all",
+                  isActive ? "bg-primary-50 text-primary-800 font-semibold" : "text-secondary-600"
+                )
+              }
+            >
+              <div className="truncate">{grant.name}</div>
+              <div className="text-xs text-secondary-400">{grant.foundation}</div>
+            </NavLink>
+          ))}
+        </nav>
+        <div className="p-4 border-t border-secondary-100 mt-auto">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 bg-secondary-200 rounded-full flex items-center justify-center">
+              <User size={16} className="text-secondary-600" />
+            </div>
+            <div className="flex-1 min-w-0 text-sm text-secondary-900 truncate">
+              {session.user.email}
+            </div>
+          </div>
+          <button
+            onClick={onSignOut}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-secondary-600 hover:bg-secondary-100 rounded-lg text-sm"
+          >
+            <LogOut size={16} /> Sign out
+          </button>
+        </div>
+      </aside>
+
+      {/* Desktop Sidebar */}
       <aside className="w-80 bg-white border-r border-secondary-200 h-screen fixed overflow-y-auto hidden md:flex flex-col z-20 shadow-sm">
         <div className="p-6 border-b border-secondary-100 sticky top-0 bg-white/95 backdrop-blur z-10">
           <a
@@ -974,7 +1074,7 @@ function AuthenticatedApp({ session, onSignOut }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-80 min-h-screen">
+      <main className="flex-1 md:ml-80 min-h-screen pt-16 md:pt-0">
         <div className="max-w-7xl mx-auto p-6 md:p-10 lg:p-12">
           <Routes>
             <Route path="/" element={defaultGrant ? <Navigate to={`/${defaultGrant}`} replace /> : <div className="text-center py-20 text-secondary-400">No grants yet</div>} />
@@ -988,18 +1088,17 @@ function AuthenticatedApp({ session, onSignOut }) {
 
 // Device Auth page for CLI OAuth flow
 function DeviceAuthPage() {
-  const [status, setStatus] = useState('loading') // loading, signing_in, authorizing, success, error
-  const [error, setError] = useState(null)
-  const [session, setSession] = useState(null)
-
   // Get device code from URL
   const searchParams = new URLSearchParams(window.location.search)
   const deviceCode = searchParams.get('code')
 
+  // Initialize state based on device code presence
+  const [status, setStatus] = useState(deviceCode ? 'loading' : 'error')
+  const [error, setError] = useState(deviceCode ? null : 'No device code provided. Please start authentication from the CLI.')
+  const [session, setSession] = useState(null)
+
   useEffect(() => {
     if (!deviceCode) {
-      setStatus('error')
-      setError('No device code provided. Please start authentication from the CLI.')
       return
     }
 
@@ -1026,36 +1125,36 @@ function DeviceAuthPage() {
 
   // When we have a session, complete the device auth
   useEffect(() => {
+    const completeAuth = async () => {
+      try {
+        // The CLI creates the device code - we just complete it
+        const { data, error: completeError } = await completeDeviceAuth(deviceCode, session)
+
+        if (completeError) {
+          // Might be expired or already used
+          if (completeError.message?.includes('No rows') || completeError.code === 'PGRST116') {
+            setError('Device code expired or already used. Please run "grantkit auth login" again.')
+          } else {
+            setError(completeError.message)
+          }
+          setStatus('error')
+        } else if (!data) {
+          // No data returned - device code not found or not in pending state
+          setError('Device code not found or already used. Please run "grantkit auth login" again.')
+          setStatus('error')
+        } else {
+          setStatus('success')
+        }
+      } catch (err) {
+        setError(err.message)
+        setStatus('error')
+      }
+    }
+
     if (status === 'authorizing' && session && deviceCode) {
       completeAuth()
     }
   }, [status, session, deviceCode])
-
-  const completeAuth = async () => {
-    try {
-      // The CLI creates the device code - we just complete it
-      const { data, error: completeError } = await completeDeviceAuth(deviceCode, session)
-
-      if (completeError) {
-        // Might be expired or already used
-        if (completeError.message?.includes('No rows') || completeError.code === 'PGRST116') {
-          setError('Device code expired or already used. Please run "grantkit auth login" again.')
-        } else {
-          setError(completeError.message)
-        }
-        setStatus('error')
-      } else if (!data) {
-        // No data returned - device code not found or not in pending state
-        setError('Device code not found or already used. Please run "grantkit auth login" again.')
-        setStatus('error')
-      } else {
-        setStatus('success')
-      }
-    } catch (e) {
-      setError(e.message)
-      setStatus('error')
-    }
-  }
 
   const handleSignIn = async () => {
     setStatus('signing_in')
@@ -1158,7 +1257,7 @@ function WaitlistPage({ email, onSignOut }) {
     // Store email in waitlist (we'll add the table)
     try {
       await supabase.from('waitlist').insert({ email })
-    } catch (e) {
+    } catch {
       // Ignore errors (might already exist)
     }
     setSubmitted(true)
