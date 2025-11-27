@@ -4,7 +4,7 @@ import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOu
 import ReactMarkdown from 'react-markdown'
 import clsx from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { supabase, signInWithGoogle, signOut, getGrants, getGrant, getResponses, updateResponse, getGrantByShareToken, generateShareToken, getInternalDocuments, createInternalDocument, updateInternalDocument, deleteInternalDocument, createDeviceCode, completeDeviceAuth } from './lib/supabase'
+import { supabase, signInWithGoogle, signOut, getGrants, getGrant, getResponses, updateResponse, getGrantByShareToken, generateShareToken, getInternalDocuments, createInternalDocument, updateInternalDocument, deleteInternalDocument, completeDeviceAuth } from './lib/supabase'
 
 // Utility for class merging
 function cn(...inputs) {
@@ -1315,19 +1315,20 @@ function DeviceAuthPage() {
 
   const completeAuth = async () => {
     try {
-      // First, ensure the device code exists (create if not)
-      await createDeviceCode(deviceCode)
-
-      // Complete the auth
+      // The CLI creates the device code - we just complete it
       const { data, error: completeError } = await completeDeviceAuth(deviceCode, session)
 
       if (completeError) {
         // Might be expired or already used
-        if (completeError.message?.includes('No rows')) {
-          setError('Device code expired or already used. Please try again from the CLI.')
+        if (completeError.message?.includes('No rows') || completeError.code === 'PGRST116') {
+          setError('Device code expired or already used. Please run "grantkit auth login" again.')
         } else {
           setError(completeError.message)
         }
+        setStatus('error')
+      } else if (!data) {
+        // No data returned - device code not found or not in pending state
+        setError('Device code not found or already used. Please run "grantkit auth login" again.')
         setStatus('error')
       } else {
         setStatus('success')
