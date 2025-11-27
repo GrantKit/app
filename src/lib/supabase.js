@@ -194,3 +194,41 @@ export const deleteInternalDocument = async (id) => {
     .eq('id', id)
   return { error }
 }
+
+// Device auth helpers for CLI OAuth flow
+export const getDeviceCode = async (code) => {
+  const { data, error } = await supabase
+    .from('device_codes')
+    .select('*')
+    .eq('code', code)
+    .single()
+  return { data, error }
+}
+
+export const createDeviceCode = async (code) => {
+  const { data, error } = await supabase
+    .from('device_codes')
+    .insert({ code, status: 'pending' })
+    .select()
+    .single()
+  return { data, error }
+}
+
+export const completeDeviceAuth = async (code, session) => {
+  const { data, error } = await supabase
+    .from('device_codes')
+    .update({
+      user_id: session.user.id,
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+      expires_at: session.expires_at,
+      user_email: session.user.email,
+      status: 'complete',
+      completed_at: new Date().toISOString(),
+    })
+    .eq('code', code)
+    .eq('status', 'pending')
+    .select()
+    .single()
+  return { data, error }
+}
