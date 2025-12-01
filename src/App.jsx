@@ -1722,12 +1722,8 @@ function PublicGrantView() {
 // Domain configuration
 const hostname = window.location.hostname
 const DEV_MODE = hostname === 'localhost'
-const isMarketingDomain = hostname === 'grantkit.io' || hostname === 'www.grantkit.io'
-
-// Redirect marketing domain to static website
-if (isMarketingDomain && typeof window !== 'undefined') {
-  window.location.replace('https://grantkit.io')
-}
+// Note: grantkit.io and app.grantkit.io both serve the app for now
+// TODO: Set up separate landing page at grantkit.io
 
 // Simple login page for app.grantkit.io
 function LoginPage() {
