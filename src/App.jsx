@@ -921,7 +921,7 @@ function SubmissionChecklist({ grant, responses }) {
 }
 
 // Permissions Modal (Google Drive-style sharing)
-function PermissionsModal({ grantId, isOpen, onClose }) {
+function PermissionsModal({ grantId, grant, isOpen, onClose, onGrantUpdate }) {
   const [permissions, setPermissions] = useState([])
   const [loading, setLoading] = useState(true)
   const [newEmail, setNewEmail] = useState('')
@@ -929,6 +929,34 @@ function PermissionsModal({ grantId, isOpen, onClose }) {
   const [newRole, setNewRole] = useState('viewer')
   const [addMode, setAddMode] = useState('email') // 'email' or 'domain'
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
+  const [linkCopied, setLinkCopied] = useState(false)
+  const [generatingLink, setGeneratingLink] = useState(false)
+
+  const shareUrl = grant?.share_token
+    ? `${window.location.origin}/share/${grant.share_token}`
+    : null
+
+  const handleCopyLink = async () => {
+    if (!shareUrl) {
+      // Generate share token first
+      setGeneratingLink(true)
+      const { token } = await generateShareToken(grantId)
+      setGeneratingLink(false)
+      if (token) {
+        const url = `${window.location.origin}/share/${token}`
+        await navigator.clipboard.writeText(url)
+        setLinkCopied(true)
+        setTimeout(() => setLinkCopied(false), 2000)
+        // Trigger parent to refresh grant data
+        if (onGrantUpdate) onGrantUpdate()
+      }
+    } else {
+      await navigator.clipboard.writeText(shareUrl)
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    }
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -948,13 +976,17 @@ function PermissionsModal({ grantId, isOpen, onClose }) {
     if (addMode === 'domain' && !newDomain) return
 
     setSaving(true)
-    const { error } = await addPermission(grantId, {
+    setError(null)
+    const { data, error: addError } = await addPermission(grantId, {
       email: addMode === 'email' ? newEmail : null,
       domain: addMode === 'domain' ? newDomain : null,
       role: newRole
     })
 
-    if (!error) {
+    if (addError) {
+      console.error('Permission add error:', addError)
+      setError(addError.message || 'Failed to add permission')
+    } else {
       setNewEmail('')
       setNewDomain('')
       await loadPermissions()
@@ -1060,6 +1092,11 @@ function PermissionsModal({ grantId, isOpen, onClose }) {
               {saving ? 'Adding...' : 'Add'}
             </button>
           </div>
+          {error && (
+            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {error}
+            </div>
+          )}
         </div>
 
         {/* Permissions list */}
@@ -1116,10 +1153,48 @@ function PermissionsModal({ grantId, isOpen, onClose }) {
           )}
         </div>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-secondary-200 bg-secondary-50 text-xs text-secondary-500">
-          <Globe size={12} className="inline mr-1" />
-          Public link sharing is also available via the Share button
+        {/* Copy Link Section - Google Drive style */}
+        <div className="p-4 border-t border-secondary-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-secondary-100 flex items-center justify-center">
+                <Link size={18} className="text-secondary-600" />
+              </div>
+              <div>
+                <div className="font-medium text-secondary-900 text-sm">Anyone with the link</div>
+                <div className="text-xs text-secondary-500">
+                  {shareUrl ? 'Can view this grant' : 'No link created yet'}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={handleCopyLink}
+              disabled={generatingLink}
+              className={cn(
+                "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2",
+                linkCopied
+                  ? "bg-green-100 text-green-700"
+                  : "bg-primary-100 text-primary-700 hover:bg-primary-200 disabled:opacity-50"
+              )}
+            >
+              {generatingLink ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-300 border-t-primary-600" />
+                  Creating...
+                </>
+              ) : linkCopied ? (
+                <>
+                  <Check size={16} />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy size={16} />
+                  Copy link
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1414,21 +1489,26 @@ function BudgetForm({ grantId }) {
                     A. Senior/Key Personnel
                   </td>
                 </tr>
-                {budget.personnel?.senior_key?.map((person, idx) => (
+                {budget.personnel?.senior_key?.map((person, idx) => {
+                  // Support both per-year (year_1, year_2) and flat (funds_per_year) formats
+                  const getYearFunds = (y) => person[`year_${y + 1}`] ?? person.funds_per_year ?? 0
+                  const getYearMonths = (y) => person[`year_${y + 1}_months`] ?? person.months_per_year
+                  const totalFunds = [...Array(yearsInBudget)].reduce((sum, _, i) => sum + getYearFunds(i), 0)
+                  return (
                   <tr key={idx} className="border-b border-secondary-100">
                     <td className="px-4 py-2 pl-8">{person.name} ({person.role})</td>
                     {[...Array(yearsInBudget)].map((_, yearIdx) => (
                       <>
                         <td key={`${yearIdx}-p`} className="px-2 py-2 text-center">1</td>
-                        <td key={`${yearIdx}-m`} className="px-2 py-2 text-center">{person.months_per_year?.toFixed(2)}</td>
-                        <td key={`${yearIdx}-f`} className="px-2 py-2 text-center">{formatCurrency(person.funds_per_year)}</td>
+                        <td key={`${yearIdx}-m`} className="px-2 py-2 text-center">{getYearMonths(yearIdx)?.toFixed(2)}</td>
+                        <td key={`${yearIdx}-f`} className="px-2 py-2 text-center">{formatCurrency(getYearFunds(yearIdx))}</td>
                       </>
                     ))}
                     <td className="px-4 py-2 text-right font-medium">
-                      {formatCurrency(person.funds_per_year * yearsInBudget)}
+                      {formatCurrency(totalFunds)}
                     </td>
                   </tr>
-                ))}
+                )})}
 
                 {/* Other Personnel */}
                 <tr className="bg-secondary-50">
@@ -1436,21 +1516,26 @@ function BudgetForm({ grantId }) {
                     B. Other Personnel
                   </td>
                 </tr>
-                {budget.personnel?.other?.map((person, idx) => (
+                {budget.personnel?.other?.map((person, idx) => {
+                  // Support both per-year (year_1, year_2) and flat (funds_per_year) formats
+                  const getYearFunds = (y) => person[`year_${y + 1}`] ?? person.funds_per_year ?? 0
+                  const getYearFte = (y) => person[`year_${y + 1}_fte`] ?? person.fte ?? 1
+                  const totalFunds = [...Array(yearsInBudget)].reduce((sum, _, i) => sum + getYearFunds(i), 0)
+                  return (
                   <tr key={idx} className="border-b border-secondary-100">
                     <td className="px-4 py-2 pl-8">{person.title || person.category}</td>
                     {[...Array(yearsInBudget)].map((_, yearIdx) => (
                       <>
                         <td key={`${yearIdx}-p`} className="px-2 py-2 text-center">1</td>
-                        <td key={`${yearIdx}-m`} className="px-2 py-2 text-center">{((person.fte || 1) * 12).toFixed(2)}</td>
-                        <td key={`${yearIdx}-f`} className="px-2 py-2 text-center">{formatCurrency(person.funds_per_year)}</td>
+                        <td key={`${yearIdx}-m`} className="px-2 py-2 text-center">{(getYearFte(yearIdx) * 12).toFixed(2)}</td>
+                        <td key={`${yearIdx}-f`} className="px-2 py-2 text-center">{formatCurrency(getYearFunds(yearIdx))}</td>
                       </>
                     ))}
                     <td className="px-4 py-2 text-right font-medium">
-                      {formatCurrency(person.funds_per_year * yearsInBudget)}
+                      {formatCurrency(totalFunds)}
                     </td>
                   </tr>
-                ))}
+                )})}
 
                 {/* Fringe Benefits */}
                 <tr className="bg-secondary-50">
@@ -1459,7 +1544,7 @@ function BudgetForm({ grantId }) {
                     <>
                       <td key={`${yearIdx}-p`} className="px-2 py-2"></td>
                       <td key={`${yearIdx}-m`} className="px-2 py-2"></td>
-                      <td key={`${yearIdx}-f`} className="px-2 py-2 text-center">{formatCurrency(budget.fringe_benefits?.funds_per_year)}</td>
+                      <td key={`${yearIdx}-f`} className="px-2 py-2 text-center">{formatCurrency(budget.summary?.[`year_${yearIdx + 1}`]?.fringe_benefits ?? budget.fringe_benefits?.funds_per_year)}</td>
                     </>
                   ))}
                   <td className="px-4 py-2 text-right font-medium">
@@ -1965,8 +2050,19 @@ function GrantDetail({ onArchive, onRestore, showArchived }) {
       {/* Permissions Modal */}
       <PermissionsModal
         grantId={grantId}
+        grant={grant}
         isOpen={showPermissions}
         onClose={() => setShowPermissions(false)}
+        onGrantUpdate={async () => {
+          // Refresh grant data when share link is created
+          const { data } = await getGrant(grantId)
+          if (data) {
+            setGrant(data)
+            if (data.share_token) {
+              setShareUrl(`${window.location.origin}/share/${data.share_token}`)
+            }
+          }
+        }}
       />
     </div>
   )
