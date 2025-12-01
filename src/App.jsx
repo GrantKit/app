@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, NavLink, useParams, Navigate, useNavigate } from 'react-router-dom'
-import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Terminal, Globe, ShieldCheck, X, Check, Minus, Download, Edit3, Shield, Upload, ArrowRight, Share2, Link, Mail, FileKey, Plus, Trash2, Send, Archive, RotateCcw, Menu } from 'lucide-react'
+import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Terminal, Globe, ShieldCheck, X, Check, Minus, Download, Edit3, Shield, Upload, ArrowRight, Share2, Link, Mail, FileKey, Plus, Trash2, Send, Archive, RotateCcw, Menu, DollarSign, Save } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import clsx from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { supabase, signInWithGoogle, signOut, getGrant, getResponses, updateResponse, getGrantByShareToken, generateShareToken, getInternalDocuments, createInternalDocument, updateInternalDocument, deleteInternalDocument, completeDeviceAuth, archiveGrant, restoreGrant, getActiveGrants, getArchivedGrants } from './lib/supabase'
+import { supabase, signInWithGoogle, signOut, getGrant, getResponses, updateResponse, getGrantByShareToken, generateShareToken, getInternalDocuments, createInternalDocument, updateInternalDocument, deleteInternalDocument, completeDeviceAuth, archiveGrant, restoreGrant, getActiveGrants, getArchivedGrants, getBudget, updateBudget } from './lib/supabase'
 
 // Utility for class merging
 function cn(...inputs) {
@@ -371,6 +371,691 @@ function InternalDocumentCard({ doc, onUpdate, onDelete }) {
   )
 }
 
+// Submission Checklist component
+function SubmissionChecklist({ grant, responses }) {
+  const [expanded, setExpanded] = useState(false)
+
+  // Check which narrative sections exist and have content
+  const narrativeSections = [
+    { name: 'Project Summary', key: 'project_summary', required: true },
+    { name: 'Project Description', key: 'project_description', required: true },
+    { name: 'Budget Justification', key: 'budget_justification', required: true },
+    { name: 'Data Management Plan', key: 'data_management_plan', required: true },
+    { name: 'Facilities & Resources', key: 'facilities_resources', required: false },
+    { name: 'Personnel & Organizations', key: 'personnel_organizations', required: false },
+    { name: 'Delivery Metrics', key: 'delivery_metrics', required: false },
+  ]
+
+  const nsfToolSections = [
+    { name: 'Bio Sketch (PI)', tool: 'SciENcv', url: 'https://sciencv.ncbi.nlm.nih.gov', required: true },
+    { name: 'Bio Sketch (Co-PI)', tool: 'SciENcv', url: 'https://sciencv.ncbi.nlm.nih.gov', required: false },
+    { name: 'Current & Pending Support', tool: 'Research.gov', url: 'https://research.gov', required: true },
+    { name: 'Budget Form', tool: 'Research.gov', url: 'https://research.gov', required: true },
+  ]
+
+  const supplementary = [
+    { name: 'Letters of Collaboration', required: false },
+    { name: 'Postdoc Mentoring Plan', required: false },
+  ]
+
+  // Check if a response exists and has content
+  const hasContent = (key) => {
+    const response = responses.find(r => r.key === key || r.title?.toLowerCase().includes(key.replace('_', ' ')))
+    return response && response.content && response.content.trim().length > 100
+  }
+
+  const narrativeComplete = narrativeSections.filter(s => hasContent(s.key)).length
+  const narrativeTotal = narrativeSections.length
+  const progress = Math.round((narrativeComplete / narrativeTotal) * 100)
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-secondary-200 mb-8 overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full p-6 flex items-center justify-between hover:bg-secondary-50 transition-colors"
+      >
+        <div className="flex items-center gap-4">
+          <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+            <CheckCircle size={20} />
+          </div>
+          <div className="text-left">
+            <h3 className="font-bold text-secondary-900">Submission Checklist</h3>
+            <p className="text-sm text-secondary-500">
+              {narrativeComplete}/{narrativeTotal} narrative sections complete
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="w-32 h-2 bg-secondary-100 rounded-full overflow-hidden">
+            <div
+              className={cn(
+                "h-full rounded-full transition-all",
+                progress === 100 ? "bg-green-500" : progress > 50 ? "bg-blue-500" : "bg-amber-500"
+              )}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <span className="text-sm font-medium text-secondary-600">{progress}%</span>
+          <svg
+            className={cn("w-5 h-5 text-secondary-400 transition-transform", expanded && "rotate-180")}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="border-t border-secondary-100 p-6 bg-secondary-50/50">
+          {/* Narrative Documents */}
+          <div className="mb-6">
+            <h4 className="text-sm font-bold text-green-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <FileText size={14} />
+              Narrative Documents
+              <span className="font-normal text-secondary-500 normal-case">(GrantKit generates)</span>
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {narrativeSections.map((section) => {
+                const complete = hasContent(section.key)
+                return (
+                  <div key={section.key} className="flex items-center gap-3 py-2">
+                    {complete ? (
+                      <CheckCircle size={18} className="text-green-500 flex-shrink-0" />
+                    ) : section.required ? (
+                      <X size={18} className="text-red-500 flex-shrink-0" />
+                    ) : (
+                      <Circle size={18} className="text-secondary-300 flex-shrink-0" />
+                    )}
+                    <span className={cn(
+                      "text-sm",
+                      complete ? "text-secondary-700" : section.required ? "text-red-700" : "text-secondary-500"
+                    )}>
+                      {section.name}
+                      {section.required && !complete && <span className="text-red-500 ml-1">*</span>}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* NSF Tools */}
+          <div className="mb-6">
+            <h4 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <Globe size={14} />
+              Required Forms
+              <span className="font-normal text-secondary-500 normal-case">(use NSF tools)</span>
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {nsfToolSections.map((section) => (
+                <div key={section.name} className="flex items-center gap-3 py-2">
+                  <Circle size={18} className="text-secondary-300 flex-shrink-0" />
+                  <span className="text-sm text-secondary-600">
+                    {section.name}
+                    {section.required && <span className="text-red-500 ml-1">*</span>}
+                  </span>
+                  <a
+                    href={section.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                  >
+                    {section.tool} <ExternalLink size={10} />
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Supplementary */}
+          <div>
+            <h4 className="text-sm font-bold text-amber-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <FileKey size={14} />
+              Supplementary
+              <span className="font-normal text-secondary-500 normal-case">(if applicable)</span>
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {supplementary.map((section) => (
+                <div key={section.name} className="flex items-center gap-3 py-2">
+                  <Circle size={18} className="text-secondary-300 flex-shrink-0" />
+                  <span className="text-sm text-secondary-500">{section.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Grant Metadata Section (expandable details)
+function GrantMetadataSection({ grant }) {
+  const [expanded, setExpanded] = useState(false)
+
+  // Extract metadata from various possible locations
+  const researchGov = grant.nsf_config || {}
+  const metadata = grant.metadata || {}
+  const contact = grant.contact || {}
+  const project = grant.project || {}
+
+  // Check if we have any extended metadata to show
+  const hasExtendedData = grant.requested_start_date ||
+    researchGov.directorate || researchGov.division || researchGov.requested_start_date ||
+    grant.pi_name || grant.pi_email || contact.pi_name ||
+    grant.repo_url || grant.solicitation_url
+
+  if (!hasExtendedData) return null
+
+  // Helper to format dates nicely
+  const formatDate = (dateStr) => {
+    if (!dateStr) return null
+    try {
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      })
+    } catch {
+      return dateStr
+    }
+  }
+
+  // Gather all metadata fields
+  const fields = [
+    // Dates
+    { label: 'Requested Start', value: formatDate(grant.requested_start_date || researchGov.requested_start_date), category: 'Timeline' },
+    { label: 'Duration', value: researchGov.requested_duration_months ? `${researchGov.requested_duration_months} months` : null, category: 'Timeline' },
+
+    // NSF/Research.gov specific
+    { label: 'Directorate', value: researchGov.directorate, category: 'NSF' },
+    { label: 'Division', value: researchGov.division, category: 'NSF' },
+    { label: 'Program Announcement', value: researchGov.program_announcement, category: 'NSF' },
+    { label: 'Proposal Type', value: researchGov.proposal_type, category: 'NSF' },
+
+    // Organization
+    { label: 'Organization', value: researchGov.organization_name || metadata.organization, category: 'Organization' },
+    { label: 'UEI', value: researchGov.organization_uei, category: 'Organization' },
+    { label: 'Fiscal Sponsor', value: grant.fiscal_sponsor || metadata.fiscal_sponsor, category: 'Organization' },
+
+    // PI Info
+    { label: 'PI Name', value: grant.pi_name || researchGov.pi_name || contact.pi_name, category: 'Personnel' },
+    { label: 'PI Email', value: grant.pi_email || researchGov.pi_email || contact.pi_email, category: 'Personnel' },
+    { label: 'Co-PI', value: grant.co_pi_name || contact.co_pi_name, category: 'Personnel' },
+  ].filter(f => f.value)
+
+  // Group by category
+  const categories = [...new Set(fields.map(f => f.category))]
+
+  return (
+    <div className="mt-6 border-t border-secondary-100 pt-4">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-2 text-sm text-secondary-500 hover:text-secondary-700 transition-colors"
+      >
+        <svg
+          className={cn("w-4 h-4 transition-transform", expanded && "rotate-180")}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+        <span className="font-medium">{expanded ? 'Hide' : 'Show'} Details</span>
+        <span className="text-secondary-400">({fields.length} fields)</span>
+      </button>
+
+      {expanded && (
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {categories.map(category => (
+            <div key={category}>
+              <h4 className="text-xs font-bold text-secondary-400 uppercase tracking-wider mb-3">{category}</h4>
+              <div className="space-y-2">
+                {fields.filter(f => f.category === category).map(field => (
+                  <div key={field.label} className="flex justify-between items-start gap-2">
+                    <span className="text-sm text-secondary-500">{field.label}</span>
+                    <span className="text-sm font-medium text-secondary-900 text-right">{field.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// NSF Budget Form Component - mirrors Research.gov interface
+function BudgetForm({ grantId }) {
+  const [budget, setBudget] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+  const [hasChanges, setHasChanges] = useState(false)
+
+  const yearsInBudget = budget?.years_in_budget || 3
+
+  useEffect(() => {
+    async function loadBudget() {
+      setLoading(true)
+      const { data } = await getBudget(grantId)
+      setBudget(data)
+      setLoading(false)
+    }
+    loadBudget()
+  }, [grantId])
+
+  const handleSave = async () => {
+    setSaving(true)
+    await updateBudget(grantId, budget)
+    setHasChanges(false)
+    setSaving(false)
+  }
+
+  const updateField = (path, value) => {
+    setBudget(prev => {
+      const updated = JSON.parse(JSON.stringify(prev))
+      const keys = path.split('.')
+      let obj = updated
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!obj[keys[i]]) obj[keys[i]] = {}
+        obj = obj[keys[i]]
+      }
+      obj[keys[keys.length - 1]] = value
+      return updated
+    })
+    setHasChanges(true)
+  }
+
+  const formatCurrency = (val) => {
+    if (val === null || val === undefined || val === '') return ''
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(val)
+  }
+
+  const parseCurrency = (str) => {
+    if (!str) return 0
+    return parseInt(str.replace(/[^0-9.-]/g, '')) || 0
+  }
+
+  // Calculate totals
+  const calcTotals = () => {
+    if (!budget) return { direct: 0, indirect: 0, total: 0 }
+
+    const senior = budget.summary?.total?.senior_personnel || 0
+    const other = budget.summary?.total?.other_personnel || 0
+    const fringe = budget.summary?.total?.fringe_benefits || 0
+    const equipment = budget.summary?.total?.equipment || 0
+    const travel = budget.summary?.total?.travel || 0
+    const participant = budget.summary?.total?.participant_support || 0
+    const otherDirect = budget.summary?.total?.other_direct || 0
+
+    const direct = senior + other + fringe + equipment + travel + participant + otherDirect
+    const indirect = budget.summary?.total?.indirect || 0
+    const total = direct + indirect
+
+    return { direct, indirect, total }
+  }
+
+  const totals = calcTotals()
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-secondary-200 mb-8 p-6">
+        <div className="animate-pulse flex items-center gap-3">
+          <div className="w-10 h-10 bg-secondary-200 rounded-lg"></div>
+          <div className="h-6 bg-secondary-200 rounded w-32"></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!budget) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-secondary-200 mb-8 p-6">
+        <div className="flex items-center gap-3 text-secondary-400">
+          <DollarSign size={20} />
+          <span>No budget data. Run <code className="bg-secondary-100 px-2 py-1 rounded text-sm">grantkit sync push</code> to sync budget.yaml</span>
+        </div>
+      </div>
+    )
+  }
+
+  // Editable currency input
+  const CurrencyInput = ({ value, onChange, className = '' }) => (
+    <input
+      type="text"
+      value={formatCurrency(value)}
+      onChange={(e) => onChange(parseCurrency(e.target.value))}
+      className={cn(
+        "w-24 px-2 py-1 text-right border border-secondary-200 rounded focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm",
+        className
+      )}
+    />
+  )
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-secondary-200 mb-8 overflow-hidden">
+      {/* Header */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full p-6 flex items-center justify-between hover:bg-secondary-50 transition-colors"
+      >
+        <div className="flex items-center gap-4">
+          <div className="p-2 bg-green-100 text-green-600 rounded-lg">
+            <DollarSign size={20} />
+          </div>
+          <div className="text-left">
+            <h3 className="font-bold text-secondary-900">Budget (Prime Organization)</h3>
+            <p className="text-sm text-secondary-500">
+              {formatCurrency(totals.total)} Total Requested • {yearsInBudget} Years
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          {hasChanges && (
+            <span className="text-xs text-amber-600 font-medium">Unsaved changes</span>
+          )}
+          <svg
+            className={cn("w-5 h-5 text-secondary-400 transition-transform", expanded && "rotate-180")}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="border-t border-secondary-100">
+          {/* Save button */}
+          {hasChanges && (
+            <div className="p-4 bg-amber-50 border-b border-amber-100 flex justify-between items-center">
+              <span className="text-sm text-amber-700">You have unsaved changes</span>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
+              >
+                <Save size={16} />
+                {saving ? 'Saving...' : 'Save Budget'}
+              </button>
+            </div>
+          )}
+
+          {/* Personnel Direct Costs */}
+          <div className="border-b border-secondary-100">
+            <div className="bg-[#1a5276] text-white px-4 py-2 font-semibold text-sm">
+              Personnel Direct Costs
+            </div>
+            <table className="w-full text-sm">
+              <thead className="bg-[#d4ac0d] text-white">
+                <tr>
+                  <th className="px-4 py-2 text-left font-medium">Section</th>
+                  {[...Array(yearsInBudget)].map((_, i) => (
+                    <th key={i} className="px-4 py-2 text-center font-medium" colSpan="3">
+                      Year {i + 1}
+                    </th>
+                  ))}
+                  <th className="px-4 py-2 text-right font-medium">Total Funds Requested</th>
+                </tr>
+                <tr className="bg-[#d4ac0d]/80 text-xs">
+                  <th></th>
+                  {[...Array(yearsInBudget)].map((_, i) => (
+                    <>
+                      <th key={`${i}-p`} className="px-2 py-1 text-center"># Personnel</th>
+                      <th key={`${i}-m`} className="px-2 py-1 text-center">Months</th>
+                      <th key={`${i}-f`} className="px-2 py-1 text-center">Funds</th>
+                    </>
+                  ))}
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Senior/Key Personnel */}
+                <tr className="bg-secondary-50">
+                  <td className="px-4 py-2 font-medium" colSpan={1 + yearsInBudget * 3 + 1}>
+                    A. Senior/Key Personnel
+                  </td>
+                </tr>
+                {budget.personnel?.senior_key?.map((person, idx) => (
+                  <tr key={idx} className="border-b border-secondary-100">
+                    <td className="px-4 py-2 pl-8">{person.name} ({person.role})</td>
+                    {[...Array(yearsInBudget)].map((_, yearIdx) => (
+                      <>
+                        <td key={`${yearIdx}-p`} className="px-2 py-2 text-center">1</td>
+                        <td key={`${yearIdx}-m`} className="px-2 py-2 text-center">{person.months_per_year?.toFixed(2)}</td>
+                        <td key={`${yearIdx}-f`} className="px-2 py-2 text-center">{formatCurrency(person.funds_per_year)}</td>
+                      </>
+                    ))}
+                    <td className="px-4 py-2 text-right font-medium">
+                      {formatCurrency(person.funds_per_year * yearsInBudget)}
+                    </td>
+                  </tr>
+                ))}
+
+                {/* Other Personnel */}
+                <tr className="bg-secondary-50">
+                  <td className="px-4 py-2 font-medium" colSpan={1 + yearsInBudget * 3 + 1}>
+                    B. Other Personnel
+                  </td>
+                </tr>
+                {budget.personnel?.other?.map((person, idx) => (
+                  <tr key={idx} className="border-b border-secondary-100">
+                    <td className="px-4 py-2 pl-8">{person.title || person.category}</td>
+                    {[...Array(yearsInBudget)].map((_, yearIdx) => (
+                      <>
+                        <td key={`${yearIdx}-p`} className="px-2 py-2 text-center">1</td>
+                        <td key={`${yearIdx}-m`} className="px-2 py-2 text-center">{((person.fte || 1) * 12).toFixed(2)}</td>
+                        <td key={`${yearIdx}-f`} className="px-2 py-2 text-center">{formatCurrency(person.funds_per_year)}</td>
+                      </>
+                    ))}
+                    <td className="px-4 py-2 text-right font-medium">
+                      {formatCurrency(person.funds_per_year * yearsInBudget)}
+                    </td>
+                  </tr>
+                ))}
+
+                {/* Fringe Benefits */}
+                <tr className="bg-secondary-50">
+                  <td className="px-4 py-2 font-medium">C. Fringe Benefits ({(budget.fringe_benefits?.rate * 100 || 0)}%)</td>
+                  {[...Array(yearsInBudget)].map((_, yearIdx) => (
+                    <>
+                      <td key={`${yearIdx}-p`} className="px-2 py-2"></td>
+                      <td key={`${yearIdx}-m`} className="px-2 py-2"></td>
+                      <td key={`${yearIdx}-f`} className="px-2 py-2 text-center">{formatCurrency(budget.fringe_benefits?.funds_per_year)}</td>
+                    </>
+                  ))}
+                  <td className="px-4 py-2 text-right font-medium">
+                    {formatCurrency(budget.summary?.total?.fringe_benefits)}
+                  </td>
+                </tr>
+
+                {/* Total Salaries */}
+                <tr className="bg-[#d4ac0d]/20 font-medium">
+                  <td className="px-4 py-2">Total Salaries, Wages & Fringe Benefits (A-C)</td>
+                  {[...Array(yearsInBudget)].map((_, yearIdx) => (
+                    <>
+                      <td key={`${yearIdx}-p`} className="px-2 py-2"></td>
+                      <td key={`${yearIdx}-m`} className="px-2 py-2"></td>
+                      <td key={`${yearIdx}-f`} className="px-2 py-2 text-center">
+                        {formatCurrency(
+                          (budget.summary?.[`year_${yearIdx + 1}`]?.senior_personnel || 0) +
+                          (budget.summary?.[`year_${yearIdx + 1}`]?.other_personnel || 0) +
+                          (budget.summary?.[`year_${yearIdx + 1}`]?.fringe_benefits || 0)
+                        )}
+                      </td>
+                    </>
+                  ))}
+                  <td className="px-4 py-2 text-right">
+                    {formatCurrency(
+                      (budget.summary?.total?.senior_personnel || 0) +
+                      (budget.summary?.total?.other_personnel || 0) +
+                      (budget.summary?.total?.fringe_benefits || 0)
+                    )}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Additional Direct Costs */}
+          <div className="border-b border-secondary-100">
+            <div className="bg-[#1a5276] text-white px-4 py-2 font-semibold text-sm">
+              Additional Direct Costs
+            </div>
+            <table className="w-full text-sm">
+              <thead className="bg-[#d4ac0d] text-white">
+                <tr>
+                  <th className="px-4 py-2 text-left font-medium">Section</th>
+                  {[...Array(yearsInBudget)].map((_, i) => (
+                    <th key={i} className="px-4 py-2 text-center font-medium">Year {i + 1}</th>
+                  ))}
+                  <th className="px-4 py-2 text-right font-medium">Total Funds Requested</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Equipment */}
+                <tr className="border-b border-secondary-100">
+                  <td className="px-4 py-2 font-medium">D. Equipment</td>
+                  {[...Array(yearsInBudget)].map((_, i) => (
+                    <td key={i} className="px-4 py-2 text-center">$0</td>
+                  ))}
+                  <td className="px-4 py-2 text-right font-medium">$0</td>
+                </tr>
+
+                {/* Travel */}
+                <tr className="bg-secondary-50">
+                  <td className="px-4 py-2 font-medium">E. Travel</td>
+                  {[...Array(yearsInBudget)].map((_, i) => (
+                    <td key={i} className="px-4 py-2 text-center">
+                      {formatCurrency(budget.summary?.[`year_${i + 1}`]?.travel)}
+                    </td>
+                  ))}
+                  <td className="px-4 py-2 text-right font-medium">
+                    {formatCurrency(budget.summary?.total?.travel)}
+                  </td>
+                </tr>
+                {budget.travel?.domestic?.map((trip, idx) => (
+                  <tr key={idx} className="border-b border-secondary-100 text-secondary-600">
+                    <td className="px-4 py-2 pl-8 text-sm">{trip.description}</td>
+                    {[...Array(yearsInBudget)].map((_, i) => (
+                      <td key={i} className="px-4 py-2 text-center text-sm">
+                        {formatCurrency(trip.funds_per_year)}
+                      </td>
+                    ))}
+                    <td className="px-4 py-2 text-right text-sm">
+                      {formatCurrency(trip.funds_per_year * yearsInBudget)}
+                    </td>
+                  </tr>
+                ))}
+
+                {/* Participant Support */}
+                <tr className="border-b border-secondary-100">
+                  <td className="px-4 py-2 font-medium">F. Participant Support Costs</td>
+                  {[...Array(yearsInBudget)].map((_, i) => (
+                    <td key={i} className="px-4 py-2 text-center">$0</td>
+                  ))}
+                  <td className="px-4 py-2 text-right font-medium">$0</td>
+                </tr>
+
+                {/* Other Direct Costs */}
+                <tr className="bg-secondary-50">
+                  <td className="px-4 py-2 font-medium">G. Other Direct Costs</td>
+                  {[...Array(yearsInBudget)].map((_, i) => (
+                    <td key={i} className="px-4 py-2 text-center">
+                      {formatCurrency(budget.summary?.[`year_${i + 1}`]?.other_direct)}
+                    </td>
+                  ))}
+                  <td className="px-4 py-2 text-right font-medium">
+                    {formatCurrency(budget.summary?.total?.other_direct)}
+                  </td>
+                </tr>
+                {budget.other_direct_costs?.map((cost, idx) => (
+                  <tr key={idx} className="border-b border-secondary-100 text-secondary-600">
+                    <td className="px-4 py-2 pl-8 text-sm">{cost.description}</td>
+                    {[...Array(yearsInBudget)].map((_, i) => (
+                      <td key={i} className="px-4 py-2 text-center text-sm">
+                        {formatCurrency(cost.funds_per_year)}
+                      </td>
+                    ))}
+                    <td className="px-4 py-2 text-right text-sm">
+                      {formatCurrency(cost.funds_per_year * yearsInBudget)}
+                    </td>
+                  </tr>
+                ))}
+
+                {/* Total Direct */}
+                <tr className="bg-[#d4ac0d]/20 font-medium">
+                  <td className="px-4 py-2">H. Total Direct Costs (A-G)</td>
+                  {[...Array(yearsInBudget)].map((_, i) => (
+                    <td key={i} className="px-4 py-2 text-center">
+                      {formatCurrency(budget.summary?.[`year_${i + 1}`]?.total_direct)}
+                    </td>
+                  ))}
+                  <td className="px-4 py-2 text-right">
+                    {formatCurrency(budget.summary?.total?.total_direct)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Indirect Costs */}
+          <div>
+            <div className="bg-[#1a5276] text-white px-4 py-2 font-semibold text-sm">
+              Indirect Costs
+            </div>
+            <table className="w-full text-sm">
+              <thead className="bg-[#d4ac0d] text-white">
+                <tr>
+                  <th className="px-4 py-2 text-left font-medium">Section</th>
+                  {[...Array(yearsInBudget)].map((_, i) => (
+                    <th key={i} className="px-4 py-2 text-center font-medium">Year {i + 1}<br/><span className="text-xs font-normal">Rate x Base</span></th>
+                  ))}
+                  <th className="px-4 py-2 text-right font-medium">Total Funds Requested</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-secondary-100">
+                  <td className="px-4 py-2 font-medium">I. Indirect Costs ({(budget.indirect_costs?.rate * 100 || 0)}% {budget.indirect_costs?.base?.toUpperCase()})</td>
+                  {[...Array(yearsInBudget)].map((_, i) => (
+                    <td key={i} className="px-4 py-2 text-center">
+                      {formatCurrency(budget.summary?.[`year_${i + 1}`]?.indirect)}
+                    </td>
+                  ))}
+                  <td className="px-4 py-2 text-right font-medium">
+                    {formatCurrency(budget.summary?.total?.indirect)}
+                  </td>
+                </tr>
+
+                {/* Grand Total */}
+                <tr className="bg-[#1a5276] text-white font-bold">
+                  <td className="px-4 py-3">J. Total Amount Requested (H + I)</td>
+                  {[...Array(yearsInBudget)].map((_, i) => (
+                    <td key={i} className="px-4 py-3 text-center">
+                      {formatCurrency(budget.summary?.[`year_${i + 1}`]?.total)}
+                    </td>
+                  ))}
+                  <td className="px-4 py-3 text-right text-lg">
+                    {formatCurrency(budget.summary?.total?.total)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Export hint */}
+          <div className="p-4 bg-secondary-50 text-sm text-secondary-600">
+            <p>💡 Use these values to fill the Research.gov budget form. Edit <code className="bg-white px-1 rounded">budget.yaml</code> locally and run <code className="bg-white px-1 rounded">grantkit sync push</code> to update.</p>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Grant detail view
 function GrantDetail({ onArchive, onRestore, showArchived }) {
   const { grantId } = useParams()
@@ -578,7 +1263,13 @@ function GrantDetail({ onArchive, onRestore, showArchived }) {
             </div>
           </div>
         </div>
+
+        {/* Expandable Metadata Section */}
+        <GrantMetadataSection grant={grant} />
       </div>
+
+      {/* Submission Checklist */}
+      <SubmissionChecklist grant={grant} responses={responses} />
 
       {/* Responses */}
       {responses.length > 0 && (
@@ -665,6 +1356,9 @@ function GrantDetail({ onArchive, onRestore, showArchived }) {
           </div>
         )}
       </div>
+
+      {/* Budget Form */}
+      <BudgetForm grantId={grantId} />
     </div>
   )
 }

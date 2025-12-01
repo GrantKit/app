@@ -242,6 +242,26 @@ export const deleteInternalDocument = async (id) => {
   return { error }
 }
 
+// Budget helpers
+export const getBudget = async (grantId) => {
+  const { data, error } = await supabase
+    .from('grants')
+    .select('budget')
+    .eq('id', grantId)
+    .single()
+  return { data: data?.budget, error }
+}
+
+export const updateBudget = async (grantId, budget) => {
+  const { data, error } = await supabase
+    .from('grants')
+    .update({ budget })
+    .eq('id', grantId)
+    .select('budget')
+    .single()
+  return { data: data?.budget, error }
+}
+
 // Device auth helpers for CLI OAuth flow
 export const getDeviceCode = async (code) => {
   const { data, error } = await supabase
