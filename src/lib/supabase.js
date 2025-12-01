@@ -90,8 +90,6 @@ export const archiveGrant = async (id, reason = 'other') => {
   const { data, error } = await supabase
     .from('grants')
     .update({
-      archived_at: new Date().toISOString(),
-      archived_reason: reason,
       status: 'archived'
     })
     .eq('id', id)
@@ -104,8 +102,6 @@ export const restoreGrant = async (id, newStatus = 'draft') => {
   const { data, error } = await supabase
     .from('grants')
     .update({
-      archived_at: null,
-      archived_reason: null,
       status: newStatus
     })
     .eq('id', id)
@@ -118,8 +114,8 @@ export const getArchivedGrants = async () => {
   const { data, error } = await supabase
     .from('grants')
     .select('*')
-    .not('archived_at', 'is', null)
-    .order('archived_at', { ascending: false })
+    .eq('status', 'archived')
+    .order('updated_at', { ascending: false })
   return { data, error }
 }
 
@@ -127,7 +123,7 @@ export const getActiveGrants = async () => {
   const { data, error } = await supabase
     .from('grants')
     .select('*')
-    .is('archived_at', null)
+    .neq('status', 'archived')
     .order('deadline', { ascending: true })
   return { data, error }
 }
