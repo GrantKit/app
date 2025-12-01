@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, NavLink, useParams, Navigate, useNavigate } from 'react-router-dom'
-import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Terminal, Globe, ShieldCheck, X, Check, Minus, Download, Edit3, Shield, Upload, ArrowRight, Share2, Link, Mail, FileKey, Plus, Trash2, Send, Archive, RotateCcw, Menu, DollarSign, Save } from 'lucide-react'
+import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Users, Terminal, Globe, ShieldCheck, X, Check, Minus, Download, Edit3, Shield, Upload, ArrowRight, Share2, Link, Mail, FileKey, Plus, Trash2, Send, Archive, RotateCcw, Menu, DollarSign, Save, Building } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import clsx from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { supabase, signInWithGoogle, signOut, getGrant, getResponses, updateResponse, getGrantByShareToken, generateShareToken, getInternalDocuments, createInternalDocument, updateInternalDocument, deleteInternalDocument, completeDeviceAuth, archiveGrant, restoreGrant, getActiveGrants, getArchivedGrants, getBudget, updateBudget } from './lib/supabase'
+import { supabase, signInWithGoogle, signOut, getGrant, getResponses, updateResponse, getGrantByShareToken, generateShareToken, getInternalDocuments, createInternalDocument, updateInternalDocument, deleteInternalDocument, completeDeviceAuth, archiveGrant, restoreGrant, getActiveGrants, getArchivedGrants, getBudget, updateBudget, getGrantPermissions, addPermission, removePermission, updatePermissionRole } from './lib/supabase'
 
 // Utility for class merging
 function cn(...inputs) {
@@ -527,6 +527,212 @@ function SubmissionChecklist({ grant, responses }) {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+// Permissions Modal (Google Drive-style sharing)
+function PermissionsModal({ grantId, isOpen, onClose }) {
+  const [permissions, setPermissions] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [newEmail, setNewEmail] = useState('')
+  const [newDomain, setNewDomain] = useState('')
+  const [newRole, setNewRole] = useState('viewer')
+  const [addMode, setAddMode] = useState('email') // 'email' or 'domain'
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (isOpen) {
+      loadPermissions()
+    }
+  }, [isOpen, grantId])
+
+  const loadPermissions = async () => {
+    setLoading(true)
+    const { data } = await getGrantPermissions(grantId)
+    setPermissions(data || [])
+    setLoading(false)
+  }
+
+  const handleAdd = async () => {
+    if (addMode === 'email' && !newEmail) return
+    if (addMode === 'domain' && !newDomain) return
+
+    setSaving(true)
+    const { error } = await addPermission(grantId, {
+      email: addMode === 'email' ? newEmail : null,
+      domain: addMode === 'domain' ? newDomain : null,
+      role: newRole
+    })
+
+    if (!error) {
+      setNewEmail('')
+      setNewDomain('')
+      await loadPermissions()
+    }
+    setSaving(false)
+  }
+
+  const handleRemove = async (permissionId) => {
+    await removePermission(permissionId)
+    await loadPermissions()
+  }
+
+  const handleRoleChange = async (permissionId, role) => {
+    await updatePermissionRole(permissionId, role)
+    await loadPermissions()
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+      <div
+        className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[80vh] overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="p-6 border-b border-secondary-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-secondary-900 flex items-center gap-2">
+              <Users size={24} className="text-primary-600" />
+              Share Grant
+            </h2>
+            <button onClick={onClose} className="p-2 hover:bg-secondary-100 rounded-lg transition-colors">
+              <X size={20} className="text-secondary-500" />
+            </button>
+          </div>
+          <p className="text-sm text-secondary-500 mt-1">
+            Control who can view or edit this grant proposal
+          </p>
+        </div>
+
+        {/* Add new permission */}
+        <div className="p-6 border-b border-secondary-200 bg-secondary-50">
+          <div className="flex gap-2 mb-3">
+            <button
+              onClick={() => setAddMode('email')}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5",
+                addMode === 'email'
+                  ? "bg-primary-600 text-white"
+                  : "bg-white text-secondary-600 hover:bg-secondary-100"
+              )}
+            >
+              <Mail size={14} /> Person
+            </button>
+            <button
+              onClick={() => setAddMode('domain')}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5",
+                addMode === 'domain'
+                  ? "bg-primary-600 text-white"
+                  : "bg-white text-secondary-600 hover:bg-secondary-100"
+              )}
+            >
+              <Building size={14} /> Domain
+            </button>
+          </div>
+
+          <div className="flex gap-2">
+            {addMode === 'email' ? (
+              <input
+                type="email"
+                placeholder="Enter email address"
+                value={newEmail}
+                onChange={e => setNewEmail(e.target.value)}
+                className="flex-1 px-3 py-2 border border-secondary-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              />
+            ) : (
+              <div className="flex-1 flex items-center gap-1">
+                <span className="text-secondary-400 text-sm">Anyone @</span>
+                <input
+                  type="text"
+                  placeholder="policyengine.org"
+                  value={newDomain}
+                  onChange={e => setNewDomain(e.target.value)}
+                  className="flex-1 px-3 py-2 border border-secondary-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                />
+              </div>
+            )}
+            <select
+              value={newRole}
+              onChange={e => setNewRole(e.target.value)}
+              className="px-3 py-2 border border-secondary-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="viewer">Viewer</option>
+              <option value="editor">Editor</option>
+            </select>
+            <button
+              onClick={handleAdd}
+              disabled={saving || (addMode === 'email' && !newEmail) || (addMode === 'domain' && !newDomain)}
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? 'Adding...' : 'Add'}
+            </button>
+          </div>
+        </div>
+
+        {/* Permissions list */}
+        <div className="p-6 overflow-y-auto max-h-[40vh]">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-200 border-t-primary-600"></div>
+            </div>
+          ) : permissions.length === 0 ? (
+            <div className="text-center py-8 text-secondary-400">
+              <Users size={32} className="mx-auto mb-2 opacity-50" />
+              <p>No one else has access yet</p>
+              <p className="text-sm mt-1">Add people or domains above</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {permissions.map(perm => (
+                <div key={perm.id} className="flex items-center justify-between p-3 bg-secondary-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center",
+                      perm.domain ? "bg-purple-100 text-purple-600" : "bg-primary-100 text-primary-600"
+                    )}>
+                      {perm.domain ? <Building size={18} /> : <User size={18} />}
+                    </div>
+                    <div>
+                      <div className="font-medium text-secondary-900">
+                        {perm.domain ? `Anyone @${perm.domain}` : perm.user_email}
+                      </div>
+                      <div className="text-xs text-secondary-400">
+                        {perm.domain ? 'Domain access' : 'Individual access'}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={perm.role}
+                      onChange={e => handleRoleChange(perm.id, e.target.value)}
+                      className="px-2 py-1 border border-secondary-200 rounded text-sm bg-white"
+                    >
+                      <option value="viewer">Viewer</option>
+                      <option value="editor">Editor</option>
+                    </select>
+                    <button
+                      onClick={() => handleRemove(perm.id)}
+                      className="p-1.5 hover:bg-red-100 text-secondary-400 hover:text-red-600 rounded transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-secondary-200 bg-secondary-50 text-xs text-secondary-500">
+          <Globe size={12} className="inline mr-1" />
+          Public link sharing is also available via the Share button
+        </div>
+      </div>
     </div>
   )
 }
@@ -1067,6 +1273,7 @@ function GrantDetail({ onArchive, onRestore, showArchived }) {
   const [shareUrl, setShareUrl] = useState(null)
   const [shareCopied, setShareCopied] = useState(false)
   const [showNewDocForm, setShowNewDocForm] = useState(false)
+  const [showPermissions, setShowPermissions] = useState(false)
 
   useEffect(() => {
     async function loadGrant() {
@@ -1202,6 +1409,12 @@ function GrantDetail({ onArchive, onRestore, showArchived }) {
                 <Archive size={16} /> Archive
               </button>
             )}
+            <button
+              onClick={() => setShowPermissions(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-medium text-sm hover:bg-purple-700 transition-all"
+            >
+              <Users size={16} /> Manage Access
+            </button>
             <button
               onClick={handleShare}
               className={cn(
@@ -1359,6 +1572,13 @@ function GrantDetail({ onArchive, onRestore, showArchived }) {
 
       {/* Budget Form */}
       <BudgetForm grantId={grantId} />
+
+      {/* Permissions Modal */}
+      <PermissionsModal
+        grantId={grantId}
+        isOpen={showPermissions}
+        onClose={() => setShowPermissions(false)}
+      />
     </div>
   )
 }

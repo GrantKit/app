@@ -295,3 +295,88 @@ export const completeDeviceAuth = async (code, session) => {
     .single()
   return { data, error }
 }
+
+// Permissions helpers
+export const getGrantPermissions = async (grantId) => {
+  const { data, error } = await supabase
+    .from('grant_permissions')
+    .select('*')
+    .eq('grant_id', grantId)
+    .order('created_at', { ascending: false })
+  return { data, error }
+}
+
+export const addPermission = async (grantId, { email, domain, role }) => {
+  const { data: { user } } = await supabase.auth.getUser()
+  const permission = {
+    grant_id: grantId,
+    role: role || 'viewer',
+    created_by: user?.id
+  }
+  if (email) permission.user_email = email.toLowerCase()
+  if (domain) permission.domain = domain.toLowerCase()
+
+  const { data, error } = await supabase
+    .from('grant_permissions')
+    .upsert(permission, {
+      onConflict: email ? 'grant_id,user_email' : 'grant_id,domain'
+    })
+    .select()
+    .single()
+  return { data, error }
+}
+
+export const removePermission = async (permissionId) => {
+  const { error } = await supabase
+    .from('grant_permissions')
+    .delete()
+    .eq('id', permissionId)
+  return { error }
+}
+
+export const updatePermissionRole = async (permissionId, role) => {
+  const { data, error } = await supabase
+    .from('grant_permissions')
+    .update({ role })
+    .eq('id', permissionId)
+    .select()
+    .single()
+  return { data, error }
+}
+
+// Check if current user has access to a grant
+export const checkGrantAccess = async (grantId) => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { hasAccess: false, role: null }
+
+  const email = user.email?.toLowerCase()
+  const domain = email?.split('@')[1]
+
+  // Check direct ownership first
+  const { data: grant } = await supabase
+    .from('grants')
+    .select('user_id')
+    .eq('id', grantId)
+    .single()
+
+  if (grant?.user_id === user.id) {
+    return { hasAccess: true, role: 'owner' }
+  }
+
+  // Check permissions table
+  const { data: permissions } = await supabase
+    .from('grant_permissions')
+    .select('role')
+    .eq('grant_id', grantId)
+    .or(`user_email.eq.${email},domain.eq.${domain}`)
+
+  if (permissions?.length > 0) {
+    // Return highest role (owner > editor > viewer)
+    const roleOrder = { owner: 3, editor: 2, viewer: 1 }
+    const bestRole = permissions.reduce((best, p) =>
+      roleOrder[p.role] > roleOrder[best] ? p.role : best, 'viewer')
+    return { hasAccess: true, role: bestRole }
+  }
+
+  return { hasAccess: false, role: null }
+}
