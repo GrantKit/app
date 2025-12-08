@@ -316,14 +316,38 @@ export const addPermission = async (grantId, { email, domain, role }) => {
   if (email) permission.user_email = email.toLowerCase()
   if (domain) permission.domain = domain.toLowerCase()
 
-  const { data, error } = await supabase
+  // First try to find existing permission to update
+  let query = supabase
     .from('grant_permissions')
-    .upsert(permission, {
-      onConflict: email ? 'grant_id,user_email' : 'grant_id,domain'
-    })
-    .select()
-    .single()
-  return { data, error }
+    .select('id')
+    .eq('grant_id', grantId)
+
+  if (email) {
+    query = query.eq('user_email', email.toLowerCase())
+  } else if (domain) {
+    query = query.eq('domain', domain.toLowerCase())
+  }
+
+  const { data: existing } = await query.maybeSingle()
+
+  if (existing) {
+    // Update existing permission
+    const { data, error } = await supabase
+      .from('grant_permissions')
+      .update({ role: role || 'viewer' })
+      .eq('id', existing.id)
+      .select()
+      .single()
+    return { data, error }
+  } else {
+    // Insert new permission
+    const { data, error } = await supabase
+      .from('grant_permissions')
+      .insert(permission)
+      .select()
+      .single()
+    return { data, error }
+  }
 }
 
 export const removePermission = async (permissionId) => {

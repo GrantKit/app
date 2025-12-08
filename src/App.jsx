@@ -43,7 +43,7 @@ function LandingPage() {
           <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto rounded-xl" />
+                <img src="/logo.svg" alt="GrantKit" className="h-10 w-auto rounded-xl" />
                 <div className="absolute -inset-1 bg-electric-500/20 rounded-xl blur-lg -z-10" />
               </div>
               <span className="text-xl font-bold text-secondary-900 tracking-tight">GrantKit</span>
@@ -450,7 +450,7 @@ function LandingPage() {
       <footer className="relative border-t border-secondary-100 py-8">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-sm text-secondary-500">
           <div className="flex items-center gap-3">
-            <img src="/logo-icon.jpeg" alt="GrantKit" className="h-8 w-auto rounded-lg" />
+            <img src="/logo.svg" alt="GrantKit" className="h-8 w-auto rounded-lg" />
             <span className="font-semibold text-secondary-700">GrantKit</span>
           </div>
           <div className="flex items-center gap-6">
@@ -2234,7 +2234,7 @@ function PublicGrantView() {
       <header className="bg-white border-b border-secondary-200 py-4 px-6">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo-icon.jpeg" alt="GrantKit" className="h-8 w-auto" />
+            <img src="/logo.svg" alt="GrantKit" className="h-8 w-auto" />
             <span className="text-lg font-bold text-secondary-900">GrantKit</span>
             <span className="text-secondary-400">|</span>
             <span className="text-secondary-600">Shared Proposal</span>
@@ -2338,7 +2338,7 @@ function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-secondary-50 to-white flex items-center justify-center p-6">
       <div className="max-w-md w-full bg-white rounded-2xl border border-secondary-200 shadow-lg p-8 text-center">
-        <img src="/logo-icon.jpeg" alt="GrantKit" className="h-16 w-auto mx-auto mb-6" />
+        <img src="/logo.svg" alt="GrantKit" className="h-16 w-auto mx-auto mb-6" />
         <h1 className="text-2xl font-bold text-secondary-900 mb-2">Welcome to GrantKit</h1>
         <p className="text-secondary-600 mb-8">
           Sign in to manage your grant applications.
@@ -2407,7 +2407,7 @@ function AuthenticatedApp({ session, onSignOut }) {
           <Menu size={24} />
         </button>
         <a href="https://grantkit.io" className="flex items-center gap-2">
-          <img src="/logo-icon.jpeg" alt="GrantKit" className="h-8 w-auto rounded-lg" />
+          <img src="/logo.svg" alt="GrantKit" className="h-8 w-auto rounded-lg" />
           <span className="font-bold text-midnight-900 tracking-tight">GrantKit</span>
         </a>
         <div className="w-10" />
@@ -2429,7 +2429,7 @@ function AuthenticatedApp({ session, onSignOut }) {
         <div className="p-5 border-b border-midnight-100 flex items-center justify-between sidebar-brand">
           <a href="https://grantkit.io" className="flex items-center gap-3">
             <div className="relative">
-              <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto rounded-xl" />
+              <img src="/logo.svg" alt="GrantKit" className="h-10 w-auto rounded-xl" />
               <div className="absolute -inset-1 bg-electric-500/20 rounded-xl blur-lg -z-10" />
             </div>
             <span className="text-xl font-bold text-midnight-900 tracking-tight">GrantKit</span>
@@ -2520,7 +2520,7 @@ function AuthenticatedApp({ session, onSignOut }) {
             title="GrantKit home"
           >
             <div className="relative">
-              <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto rounded-xl" />
+              <img src="/logo.svg" alt="GrantKit" className="h-10 w-auto rounded-xl" />
               <div className="absolute -inset-1 bg-electric-500/20 rounded-xl blur-lg -z-10" />
             </div>
             <span className="text-xl font-bold text-midnight-900 tracking-tight">GrantKit</span>
