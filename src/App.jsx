@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, NavLink, useParams, Navigate, useNavigate } from 'react-router-dom'
-import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Users, Terminal, Globe, ShieldCheck, X, Check, Minus, Download, Edit3, Shield, Upload, ArrowRight, Share2, Link, Mail, FileKey, Plus, Trash2, Send, Archive, RotateCcw, Menu, DollarSign, Save, Building } from 'lucide-react'
+import { FileText, ExternalLink, AlertTriangle, CheckCircle, Circle, Copy, LogOut, User, Users, Terminal, Globe, ShieldCheck, X, Check, Minus, Download, Edit3, Shield, Upload, ArrowRight, Share2, Link, Mail, FileKey, Plus, Trash2, Send, Archive, RotateCcw, Menu, DollarSign, Save, Building, Sparkles, Zap, Code2, GitBranch, ChevronRight, LayoutGrid, FolderOpen, Clock, Target } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import clsx from 'clsx'
 import { twMerge } from 'tailwind-merge'
@@ -22,7 +22,7 @@ const copyToClipboard = async (text) => {
   }
 }
 
-// Landing page component
+// Landing page component - Technical Editorial design
 function LandingPage() {
   const [loading, setLoading] = useState(false)
 
@@ -33,267 +33,328 @@ function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-secondary-50 to-white">
+    <div className="min-h-screen hero-gradient relative overflow-hidden">
+      {/* Subtle grid pattern overlay */}
+      <div className="absolute inset-0 grid-pattern opacity-40 pointer-events-none" />
+
       {/* Header */}
-      <header className="border-b border-secondary-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto" />
-            <span className="text-xl font-bold text-secondary-900">GrantKit</span>
+      <header className="relative z-50 sticky top-0">
+        <div className="glass border-b border-secondary-100/50">
+          <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto rounded-xl" />
+                <div className="absolute -inset-1 bg-electric-500/20 rounded-xl blur-lg -z-10" />
+              </div>
+              <span className="text-xl font-bold text-secondary-900 tracking-tight">GrantKit</span>
+            </div>
+            <button
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="btn btn-primary gap-2 disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <div className="spinner" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign in'
+              )}
+            </button>
           </div>
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
-          >
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 py-20 text-center">
-        <p className="text-sm font-semibold text-primary-600 mb-4 tracking-wide uppercase">For AI-native teams</p>
-        <h1 className="text-5xl font-bold text-secondary-900 mb-6 tracking-tight">
-          You use AI agents for code.<br />
-          <span className="text-primary-600">Now use them for grants.</span>
-        </h1>
-        <p className="text-xl text-secondary-600 mb-10 max-w-2xl mx-auto">
-          GrantKit syncs your proposals to local markdown files so Claude Code, Cursor, and other AI tools can help you write them. NSF validation built in.
-        </p>
-        <button
-          onClick={handleGoogleSignIn}
-          disabled={loading}
-          className="inline-flex items-center gap-3 px-8 py-4 bg-primary-600 text-white rounded-xl font-semibold text-lg hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/30"
-        >
-          <svg className="w-6 h-6" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          {loading ? 'Signing in...' : 'Get started with Google'}
-        </button>
-        <p className="mt-4 text-sm text-secondary-500">
-          Open source · Currently in beta
-        </p>
-      </section>
+      <section className="relative max-w-6xl mx-auto px-6 pt-20 pb-24 text-center">
+        {/* Floating accent elements */}
+        <div className="absolute top-20 left-10 w-64 h-64 bg-electric-500/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute top-40 right-10 w-48 h-48 bg-electric-500/5 rounded-full blur-2xl animate-float" style={{ animationDelay: '1s' }} />
 
-      {/* Features */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-white p-8 rounded-2xl border border-secondary-200 shadow-sm">
-            <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center mb-4">
-              <FileText className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-secondary-900 mb-2">Track Applications</h3>
-            <p className="text-secondary-600">
-              Keep all your grant applications in one place. See deadlines, status, and requested amounts at a glance.
-            </p>
+        <div className="relative">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-midnight-900 text-white text-sm font-medium mb-8 animate-fade-in">
+            <Sparkles size={14} className="text-electric-400" />
+            <span>For AI-native teams</span>
+            <ChevronRight size={14} className="text-midnight-400" />
           </div>
-          <div className="bg-white p-8 rounded-2xl border border-secondary-200 shadow-sm">
-            <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center mb-4">
-              <CheckCircle className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-secondary-900 mb-2">Manage Responses</h3>
-            <p className="text-secondary-600">
-              Edit and track progress on each response. Word counts, character limits, and completion status built in.
-            </p>
+
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-secondary-900 mb-8 tracking-tight leading-[1.1] animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+            You use AI agents for code.
+            <br />
+            <span className="gradient-text">Now use them for grants.</span>
+          </h1>
+
+          <p className="text-xl md:text-2xl text-secondary-500 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+            GrantKit syncs your proposals to local markdown files so <span className="text-secondary-700 font-medium">Claude Code</span>, <span className="text-secondary-700 font-medium">Cursor</span>, and other AI tools can help you write them.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+            <button
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="btn btn-electric text-lg px-8 py-4 glow-subtle hover:glow disabled:opacity-50"
+            >
+              <svg className="w-6 h-6" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              {loading ? 'Signing in...' : 'Get started with Google'}
+            </button>
+            <a
+              href="https://github.com/GrantKit/grantkit"
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-secondary text-lg px-8 py-4"
+            >
+              <Terminal size={20} />
+              View on GitHub
+            </a>
           </div>
-          <div className="bg-white p-8 rounded-2xl border border-secondary-200 shadow-sm">
-            <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center mb-4">
-              <User className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-secondary-900 mb-2">Team Collaboration</h3>
-            <p className="text-secondary-600">
-              Everyone on your team can access and edit grants. No more version conflicts or email chains.
-            </p>
+
+          <div className="flex items-center justify-center gap-6 mt-8 text-sm text-secondary-400 animate-fade-in" style={{ animationDelay: '400ms' }}>
+            <span className="flex items-center gap-2">
+              <Code2 size={16} className="text-electric-500" />
+              Open source
+            </span>
+            <span className="w-1 h-1 rounded-full bg-secondary-300" />
+            <span className="flex items-center gap-2">
+              <Shield size={16} className="text-electric-500" />
+              NSF validated
+            </span>
+            <span className="w-1 h-1 rounded-full bg-secondary-300" />
+            <span className="flex items-center gap-2">
+              <Zap size={16} className="text-electric-500" />
+              Free forever
+            </span>
           </div>
         </div>
       </section>
 
-      {/* Why GrantKit */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-secondary-900 mb-4 text-center">Why not just use Grantable?</h2>
-        <p className="text-secondary-600 text-center mb-12 max-w-2xl mx-auto">
-          Other grant tools have their own AI built in. But you already have Claude Code. GrantKit gets out of the way and lets your tools do the writing.
-        </p>
+      {/* Features - Card grid with hover effects */}
+      <section className="relative max-w-6xl mx-auto px-6 py-20">
+        <div className="grid md:grid-cols-3 gap-6 stagger">
+          <div className="card feature-card p-8 hover-lift cursor-default animate-fade-in-up">
+            <div className="relative z-10">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-electric-500/20 to-electric-500/5 flex items-center justify-center mb-6 border border-electric-500/20">
+                <LayoutGrid className="w-7 h-7 text-electric-600" />
+              </div>
+              <h3 className="text-xl font-bold text-secondary-900 mb-3">Track Applications</h3>
+              <p className="text-secondary-500 leading-relaxed">
+                Keep all your grant applications in one place. See deadlines, status, and requested amounts at a glance.
+              </p>
+            </div>
+          </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-gradient-to-br from-primary-50 to-white p-8 rounded-2xl border border-primary-100">
-            <div className="w-12 h-12 bg-primary-600 text-white rounded-xl flex items-center justify-center mb-4">
-              <Terminal className="w-6 h-6" />
+          <div className="card feature-card p-8 hover-lift cursor-default animate-fade-in-up">
+            <div className="relative z-10">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-success-500/20 to-success-500/5 flex items-center justify-center mb-6 border border-success-500/20">
+                <Target className="w-7 h-7 text-success-600" />
+              </div>
+              <h3 className="text-xl font-bold text-secondary-900 mb-3">Manage Responses</h3>
+              <p className="text-secondary-500 leading-relaxed">
+                Edit and track progress on each response. Word counts, character limits, and completion status built in.
+              </p>
             </div>
-            <h3 className="text-lg font-bold text-secondary-900 mb-2">Open Source + CLI</h3>
-            <p className="text-secondary-600">
-              Your proposals live in Git. Use Claude Code, Cursor, or any AI tool to craft responses locally. Full control over your data.
-            </p>
           </div>
-          <div className="bg-gradient-to-br from-primary-50 to-white p-8 rounded-2xl border border-primary-100">
-            <div className="w-12 h-12 bg-primary-600 text-white rounded-xl flex items-center justify-center mb-4">
-              <Globe className="w-6 h-6" />
+
+          <div className="card feature-card p-8 hover-lift cursor-default animate-fade-in-up">
+            <div className="relative z-10">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-warning-500/20 to-warning-500/5 flex items-center justify-center mb-6 border border-warning-500/20">
+                <Users className="w-7 h-7 text-warning-600" />
+              </div>
+              <h3 className="text-xl font-bold text-secondary-900 mb-3">Team Collaboration</h3>
+              <p className="text-secondary-500 leading-relaxed">
+                Everyone on your team can access and edit grants. No more version conflicts or email chains.
+              </p>
             </div>
-            <h3 className="text-lg font-bold text-secondary-900 mb-2">Web + Local Hybrid</h3>
-            <p className="text-secondary-600">
-              Edit in the web app for quick updates. Use your local editor for deep work. Changes sync automatically via Git.
-            </p>
           </div>
-          <div className="bg-gradient-to-br from-primary-50 to-white p-8 rounded-2xl border border-primary-100">
-            <div className="w-12 h-12 bg-primary-600 text-white rounded-xl flex items-center justify-center mb-4">
-              <ShieldCheck className="w-6 h-6" />
+        </div>
+      </section>
+
+      {/* Why GrantKit - Comparison */}
+      <section className="relative max-w-6xl mx-auto px-6 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-secondary-900 mb-4 tracking-tight">Why not just use Grantable?</h2>
+          <p className="text-xl text-secondary-500 max-w-2xl mx-auto">
+            Other grant tools have their own AI built in. But you already have Claude Code. GrantKit gets out of the way.
+          </p>
+        </div>
+
+        {/* Feature pillars */}
+        <div className="grid md:grid-cols-3 gap-8 mb-20">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-b from-electric-500/10 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative card p-8 border-2 border-transparent group-hover:border-electric-500/30 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-midnight-900 flex items-center justify-center mb-6">
+                <Terminal className="w-6 h-6 text-electric-400" />
+              </div>
+              <h3 className="text-xl font-bold text-secondary-900 mb-3">Open Source + CLI</h3>
+              <p className="text-secondary-500 leading-relaxed">
+                Your proposals live in Git. Use Claude Code, Cursor, or any AI tool to craft responses locally. Full control over your data.
+              </p>
             </div>
-            <h3 className="text-lg font-bold text-secondary-900 mb-2">Automated Validators</h3>
-            <p className="text-secondary-600">
-              NSF compliance checking built-in. Validate page limits, formatting rules, and required sections before submission.
-            </p>
+          </div>
+
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-b from-electric-500/10 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative card p-8 border-2 border-transparent group-hover:border-electric-500/30 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-midnight-900 flex items-center justify-center mb-6">
+                <GitBranch className="w-6 h-6 text-electric-400" />
+              </div>
+              <h3 className="text-xl font-bold text-secondary-900 mb-3">Web + Local Hybrid</h3>
+              <p className="text-secondary-500 leading-relaxed">
+                Edit in the web app for quick updates. Use your local editor for deep work. Changes sync automatically.
+              </p>
+            </div>
+          </div>
+
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-b from-electric-500/10 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative card p-8 border-2 border-transparent group-hover:border-electric-500/30 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-midnight-900 flex items-center justify-center mb-6">
+                <ShieldCheck className="w-6 h-6 text-electric-400" />
+              </div>
+              <h3 className="text-xl font-bold text-secondary-900 mb-3">Automated Validators</h3>
+              <p className="text-secondary-500 leading-relaxed">
+                NSF compliance checking built-in. Validate page limits, formatting rules, and required sections before submission.
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Comparison Table */}
-        <div className="bg-white rounded-2xl border border-secondary-200 overflow-hidden shadow-sm">
+        <div className="card overflow-hidden border-2 border-midnight-100">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-secondary-200 bg-secondary-50">
-                  <th className="text-left p-4 font-semibold text-secondary-900">Feature</th>
-                  <th className="text-center p-4 font-semibold text-primary-700 bg-primary-50">GrantKit</th>
-                  <th className="text-center p-4 font-semibold text-secondary-600">Instrumentl</th>
-                  <th className="text-center p-4 font-semibold text-secondary-600">Grantable</th>
-                  <th className="text-center p-4 font-semibold text-secondary-600">Google Docs</th>
+                <tr className="border-b border-midnight-100">
+                  <th className="text-left p-5 font-semibold text-secondary-900 bg-midnight-50">Feature</th>
+                  <th className="text-center p-5 font-bold text-midnight-900 bg-electric-500/10 border-x border-electric-500/20">
+                    <span className="flex items-center justify-center gap-2">
+                      <Sparkles size={16} className="text-electric-500" />
+                      GrantKit
+                    </span>
+                  </th>
+                  <th className="text-center p-5 font-medium text-secondary-500 bg-midnight-50">Instrumentl</th>
+                  <th className="text-center p-5 font-medium text-secondary-500 bg-midnight-50">Grantable</th>
+                  <th className="text-center p-5 font-medium text-secondary-500 bg-midnight-50">Google Docs</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-secondary-100">
-                <tr>
-                  <td className="p-4 text-secondary-700">Open source</td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+              <tbody className="divide-y divide-midnight-100">
+                <tr className="hover:bg-midnight-50/50 transition-colors">
+                  <td className="p-5 text-secondary-700 font-medium">Open source</td>
+                  <td className="p-5 text-center bg-electric-500/5"><Check className="w-5 h-5 text-success-500 mx-auto" /></td>
+                  <td className="p-5 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-5 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-5 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
                 </tr>
-                <tr className="bg-secondary-50/50">
-                  <td className="p-4 text-secondary-700">Local CLI + AI tools</td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><Minus className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                <tr className="hover:bg-midnight-50/50 transition-colors">
+                  <td className="p-5 text-secondary-700 font-medium">Local CLI + AI tools</td>
+                  <td className="p-5 text-center bg-electric-500/5"><Check className="w-5 h-5 text-success-500 mx-auto" /></td>
+                  <td className="p-5 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-5 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-5 text-center"><Minus className="w-5 h-5 text-secondary-300 mx-auto" /></td>
                 </tr>
-                <tr>
-                  <td className="p-4 text-secondary-700">NSF compliance validation</td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                <tr className="hover:bg-midnight-50/50 transition-colors">
+                  <td className="p-5 text-secondary-700 font-medium">NSF compliance validation</td>
+                  <td className="p-5 text-center bg-electric-500/5"><Check className="w-5 h-5 text-success-500 mx-auto" /></td>
+                  <td className="p-5 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-5 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
+                  <td className="p-5 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
                 </tr>
-                <tr className="bg-secondary-50/50">
-                  <td className="p-4 text-secondary-700">Web collaboration</td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
+                <tr className="hover:bg-midnight-50/50 transition-colors">
+                  <td className="p-5 text-secondary-700 font-medium">Web collaboration</td>
+                  <td className="p-5 text-center bg-electric-500/5"><Check className="w-5 h-5 text-success-500 mx-auto" /></td>
+                  <td className="p-5 text-center"><Check className="w-5 h-5 text-success-500 mx-auto" /></td>
+                  <td className="p-5 text-center"><Check className="w-5 h-5 text-success-500 mx-auto" /></td>
+                  <td className="p-5 text-center"><Check className="w-5 h-5 text-success-500 mx-auto" /></td>
                 </tr>
-                <tr>
-                  <td className="p-4 text-secondary-700">Built-in AI writing</td>
-                  <td className="p-4 text-center"><Minus className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><Check className="w-5 h-5 text-green-600 mx-auto" /></td>
-                  <td className="p-4 text-center"><X className="w-5 h-5 text-secondary-300 mx-auto" /></td>
-                </tr>
-                <tr className="bg-secondary-50/50">
-                  <td className="p-4 text-secondary-700">Price</td>
-                  <td className="p-4 text-center font-semibold text-green-700">Free</td>
-                  <td className="p-4 text-center text-secondary-600">$179-299/mo</td>
-                  <td className="p-4 text-center text-secondary-600">$49-199/mo</td>
-                  <td className="p-4 text-center text-secondary-600">Free</td>
+                <tr className="hover:bg-midnight-50/50 transition-colors">
+                  <td className="p-5 text-secondary-700 font-medium">Price</td>
+                  <td className="p-5 text-center bg-electric-500/5">
+                    <span className="font-bold text-success-600">Free</span>
+                  </td>
+                  <td className="p-5 text-center text-secondary-500">$179-299/mo</td>
+                  <td className="p-5 text-center text-secondary-500">$49-199/mo</td>
+                  <td className="p-5 text-center text-secondary-500">Free</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
-        <p className="text-center text-sm text-secondary-500 mt-4">
-          Pricing from public sites. GrantKit lets you use your own AI tools (Claude Code, Cursor, etc.) locally.
-        </p>
       </section>
 
-      {/* Workflow */}
-      <section className="bg-secondary-50 py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-secondary-900 mb-4 text-center">How it works</h2>
-          <p className="text-secondary-600 text-center mb-12 max-w-2xl mx-auto">
-            GrantKit syncs between local files and the cloud. Use AI tools locally, collaborate in the browser.
-          </p>
+      {/* Workflow Section */}
+      <section className="relative py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-midnight-900" />
+        <div className="absolute inset-0 opacity-30" style={{
+          backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.15) 0%, transparent 50%)'
+        }} />
 
-          {/* Workflow Steps */}
-          <div className="grid md:grid-cols-4 gap-4 mb-12">
-            <div className="bg-white p-6 rounded-2xl border border-secondary-200 shadow-sm text-center">
-              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Download className="w-6 h-6" />
-              </div>
-              <div className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 1</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Pull</h3>
-              <p className="text-sm text-secondary-600">Download grants to local markdown files</p>
-            </div>
-            <div className="bg-white p-6 rounded-2xl border border-secondary-200 shadow-sm text-center">
-              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Edit3 className="w-6 h-6" />
-              </div>
-              <div className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 2</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Edit</h3>
-              <p className="text-sm text-secondary-600">Use Claude Code, Cursor, or any AI tool</p>
-            </div>
-            <div className="bg-white p-6 rounded-2xl border border-secondary-200 shadow-sm text-center">
-              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-6 h-6" />
-              </div>
-              <div className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 3</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Validate</h3>
-              <p className="text-sm text-secondary-600">Check NSF compliance automatically</p>
-            </div>
-            <div className="bg-white p-6 rounded-2xl border border-secondary-200 shadow-sm text-center">
-              <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Upload className="w-6 h-6" />
-              </div>
-              <div className="text-xs font-bold text-primary-600 uppercase tracking-wider mb-2">Step 4</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Push</h3>
-              <p className="text-sm text-secondary-600">Sync changes back to the cloud</p>
-            </div>
+        <div className="relative max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4 tracking-tight">How it works</h2>
+            <p className="text-xl text-midnight-300 max-w-2xl mx-auto">
+              GrantKit syncs between local files and the cloud. Use AI tools locally, collaborate in the browser.
+            </p>
           </div>
 
-          {/* Code Examples */}
-          <div className="bg-secondary-900 rounded-2xl p-8 shadow-xl">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <span className="ml-4 text-secondary-400 text-sm font-mono">Terminal</span>
+          {/* Workflow Steps */}
+          <div className="grid md:grid-cols-4 gap-6 mb-16">
+            {[
+              { icon: Download, label: 'Pull', desc: 'Download grants to local markdown files', step: 1 },
+              { icon: Edit3, label: 'Edit', desc: 'Use Claude Code, Cursor, or any AI tool', step: 2 },
+              { icon: Shield, label: 'Validate', desc: 'Check NSF compliance automatically', step: 3 },
+              { icon: Upload, label: 'Push', desc: 'Sync changes back to the cloud', step: 4 },
+            ].map(({ icon: Icon, label, desc, step }) => (
+              <div key={step} className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-b from-electric-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative bg-midnight-800/50 backdrop-blur border border-midnight-700 rounded-2xl p-6 text-center hover:border-electric-500/50 transition-colors">
+                  <div className="w-14 h-14 rounded-2xl bg-electric-500/10 border border-electric-500/30 flex items-center justify-center mx-auto mb-4">
+                    <Icon className="w-7 h-7 text-electric-400" />
+                  </div>
+                  <div className="text-xs font-bold text-electric-400 uppercase tracking-wider mb-2">Step {step}</div>
+                  <h3 className="text-lg font-bold text-white mb-2">{label}</h3>
+                  <p className="text-sm text-midnight-300">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Terminal */}
+          <div className="terminal shadow-2xl">
+            <div className="terminal-header">
+              <div className="terminal-dot bg-danger-500" />
+              <div className="terminal-dot bg-warning-500" />
+              <div className="terminal-dot bg-success-500" />
+              <span className="ml-4 text-midnight-400 text-sm">Terminal</span>
             </div>
-            <div className="font-mono text-sm space-y-4">
+            <div className="terminal-body space-y-4">
               <div>
-                <span className="text-secondary-500"># Install GrantKit CLI</span>
-                <div className="text-green-400">$ pip install grantkit</div>
+                <span className="text-midnight-500"># Install GrantKit CLI</span>
+                <div className="text-electric-400">$ pip install grantkit</div>
               </div>
               <div>
-                <span className="text-secondary-500"># Pull grants from the cloud</span>
-                <div className="text-green-400">$ grantkit sync pull</div>
-                <div className="text-secondary-400 ml-2">✅ Pulled 10 grants, 94 responses</div>
+                <span className="text-midnight-500"># Pull grants from the cloud</span>
+                <div className="text-electric-400">$ grantkit sync pull</div>
+                <div className="text-success-400 ml-2">✅ Pulled 10 grants, 94 responses</div>
               </div>
               <div>
-                <span className="text-secondary-500"># Edit with your favorite AI tool</span>
-                <div className="text-green-400">$ claude "improve the broader impacts section"</div>
+                <span className="text-midnight-500"># Edit with your favorite AI tool</span>
+                <div className="text-electric-400">$ claude "improve the broader impacts section"</div>
               </div>
               <div>
-                <span className="text-secondary-500"># Validate NSF compliance</span>
-                <div className="text-green-400">$ grantkit validate</div>
-                <div className="text-secondary-400 ml-2">✅ All checks passed</div>
+                <span className="text-midnight-500"># Validate NSF compliance</span>
+                <div className="text-electric-400">$ grantkit validate</div>
+                <div className="text-success-400 ml-2">✅ All checks passed</div>
               </div>
               <div>
-                <span className="text-secondary-500"># Push changes back</span>
-                <div className="text-green-400">$ grantkit sync push</div>
-                <div className="text-secondary-400 ml-2">✅ Synced 3 responses to cloud</div>
-              </div>
-              <div>
-                <span className="text-secondary-500"># Or watch for changes and auto-sync</span>
-                <div className="text-green-400">$ grantkit sync watch</div>
-                <div className="text-secondary-400 ml-2">👀 Watching for changes...</div>
+                <span className="text-midnight-500"># Push changes back</span>
+                <div className="text-electric-400">$ grantkit sync push</div>
+                <div className="text-success-400 ml-2">✅ Synced 3 responses to cloud</div>
               </div>
             </div>
           </div>
@@ -301,109 +362,102 @@ function LandingPage() {
           {/* File Structure */}
           <div className="mt-12 grid md:grid-cols-2 gap-8">
             <div>
-              <h3 className="font-bold text-secondary-900 mb-4 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary-600" />
+              <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                <FolderOpen className="w-5 h-5 text-electric-400" />
                 Local File Structure
               </h3>
-              <div className="bg-white rounded-xl border border-secondary-200 p-6 font-mono text-sm">
-                <div className="text-secondary-600">
-                  <div>my-grants/</div>
-                  <div className="ml-4">├── nsf-cssi/</div>
+              <div className="bg-midnight-800/50 backdrop-blur rounded-xl border border-midnight-700 p-6 font-mono text-sm">
+                <div className="text-midnight-300">
+                  <div className="text-electric-400">my-grants/</div>
+                  <div className="ml-4 text-midnight-400">├── nsf-cssi/</div>
                   <div className="ml-8">├── grant.yaml</div>
                   <div className="ml-8">└── responses/</div>
                   <div className="ml-12">├── abstract.md</div>
                   <div className="ml-12">├── broader_impacts.md</div>
                   <div className="ml-12">└── technical_approach.md</div>
-                  <div className="ml-4">├── arnold-labor/</div>
-                  <div className="ml-4">└── ...</div>
+                  <div className="ml-4 text-midnight-400">├── arnold-labor/</div>
+                  <div className="ml-4 text-midnight-400">└── ...</div>
                 </div>
               </div>
             </div>
             <div>
-              <h3 className="font-bold text-secondary-900 mb-4 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary-600" />
-                Response Format (Markdown + YAML)
+              <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-electric-400" />
+                Response Format
               </h3>
-              <div className="bg-white rounded-xl border border-secondary-200 p-6 font-mono text-sm">
-                <div className="text-secondary-500">---</div>
-                <div><span className="text-primary-600">title:</span> <span className="text-secondary-700">Broader Impacts</span></div>
-                <div><span className="text-primary-600">key:</span> <span className="text-secondary-700">broader_impacts</span></div>
-                <div><span className="text-primary-600">word_limit:</span> <span className="text-secondary-700">2500</span></div>
-                <div><span className="text-primary-600">status:</span> <span className="text-secondary-700">draft</span></div>
-                <div className="text-secondary-500">---</div>
-                <div className="mt-2 text-secondary-700"># Broader Impacts</div>
-                <div className="text-secondary-600 mt-1">PolicyEngine democratizes...</div>
+              <div className="bg-midnight-800/50 backdrop-blur rounded-xl border border-midnight-700 p-6 font-mono text-sm">
+                <div className="text-midnight-500">---</div>
+                <div><span className="text-electric-400">title:</span> <span className="text-midnight-200">Broader Impacts</span></div>
+                <div><span className="text-electric-400">key:</span> <span className="text-midnight-200">broader_impacts</span></div>
+                <div><span className="text-electric-400">word_limit:</span> <span className="text-warning-400">2500</span></div>
+                <div><span className="text-electric-400">status:</span> <span className="text-success-400">draft</span></div>
+                <div className="text-midnight-500">---</div>
+                <div className="mt-2 text-midnight-200"># Broader Impacts</div>
+                <div className="text-midnight-400 mt-1">PolicyEngine democratizes...</div>
               </div>
             </div>
-          </div>
-
-          <div className="text-center mt-12">
-            <a
-              href="https://github.com/GrantKit/grantkit"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-secondary-900 text-white rounded-xl font-semibold hover:bg-secondary-800 transition-colors"
-            >
-              <Terminal className="w-5 h-5" />
-              View CLI on GitHub
-              <ArrowRight className="w-4 h-4" />
-            </a>
           </div>
         </div>
       </section>
 
       {/* Stats */}
-      <section className="bg-secondary-900 py-16">
+      <section className="relative py-20 overflow-hidden">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-white mb-2">$4.9M</div>
-              <div className="text-secondary-400">Total Requested</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white mb-2">10</div>
-              <div className="text-secondary-400">Active Grants</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white mb-2">94</div>
-              <div className="text-secondary-400">Response Sections</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white mb-2">8</div>
-              <div className="text-secondary-400">Foundations</div>
-            </div>
+            {[
+              { value: '$4.9M', label: 'Total Requested' },
+              { value: '10', label: 'Active Grants' },
+              { value: '94', label: 'Response Sections' },
+              { value: '8', label: 'Foundations' },
+            ].map(({ value, label }) => (
+              <div key={label} className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-b from-electric-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative">
+                  <div className="stat-value text-secondary-900 mb-2">{value}</div>
+                  <div className="stat-label">{label}</div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="max-w-6xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-bold text-secondary-900 mb-4">Let your AI agent write your next grant</h2>
-        <p className="text-secondary-600 mb-8">Sign in to try GrantKit. Currently in beta for PolicyEngine team.</p>
-        <button
-          onClick={handleGoogleSignIn}
-          disabled={loading}
-          className="inline-flex items-center gap-3 px-6 py-3 bg-white border-2 border-secondary-200 text-secondary-700 rounded-xl font-semibold hover:bg-secondary-50 transition-colors"
-        >
-          <svg className="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          {loading ? 'Signing in...' : 'Sign in with Google'}
-        </button>
+      <section className="relative max-w-4xl mx-auto px-6 py-24 text-center">
+        <div className="card p-12 border-2 border-midnight-100 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-electric-500/5 via-transparent to-transparent" />
+          <div className="relative">
+            <h2 className="text-4xl font-bold text-secondary-900 mb-4 tracking-tight">Let your AI agent write your next grant</h2>
+            <p className="text-xl text-secondary-500 mb-8">Sign in to try GrantKit. Currently in beta.</p>
+            <button
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="btn btn-primary text-lg px-8 py-4 disabled:opacity-50"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              {loading ? 'Signing in...' : 'Sign in with Google'}
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-secondary-100 py-8">
+      <footer className="relative border-t border-secondary-100 py-8">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-sm text-secondary-500">
-          <div className="flex items-center gap-2">
-            <img src="/logo-icon.jpeg" alt="GrantKit" className="h-8 w-auto" />
+          <div className="flex items-center gap-3">
+            <img src="/logo-icon.jpeg" alt="GrantKit" className="h-8 w-auto rounded-lg" />
             <span className="font-semibold text-secondary-700">GrantKit</span>
           </div>
-          <div>
-            <a href="https://github.com/GrantKit" className="hover:text-secondary-700 transition-colors">GitHub</a>
+          <div className="flex items-center gap-6">
+            <a href="https://github.com/GrantKit" className="hover:text-secondary-700 transition-colors flex items-center gap-2">
+              <Code2 size={16} />
+              GitHub
+            </a>
           </div>
         </div>
       </footer>
@@ -411,7 +465,7 @@ function LandingPage() {
   )
 }
 
-// Response card component
+// Response card component - Redesigned with Technical Editorial aesthetic
 function ResponseCard({ response, onUpdate }) {
   const [copied, setCopied] = useState(false)
   const [expanded, setExpanded] = useState(false)
@@ -446,142 +500,203 @@ function ResponseCard({ response, onUpdate }) {
       : `${wordCount.toLocaleString()} words`
 
   const percentage = response.word_limit ? wordPercentage : response.char_limit ? charPercentage : 0
-  const progressBarColor = percentage > 100 ? 'bg-red-500' : percentage > 80 ? 'bg-amber-500' : 'bg-primary-500'
+
+  // Determine progress bar style based on percentage
+  const getProgressStyle = () => {
+    if (percentage > 100) return 'progress-bar-fill-danger'
+    if (percentage > 80) return 'progress-bar-fill-warning'
+    return 'progress-bar-fill-electric'
+  }
+
+  // Determine status badge style
+  const getStatusStyle = () => {
+    if (overLimit) return 'badge-danger'
+    if (wordCount === 0) return 'badge-warning'
+    return 'badge-success'
+  }
 
   return (
     <>
       <div
         className={cn(
-          "border rounded-xl p-5 hover:shadow-lg transition-all duration-200 cursor-pointer bg-white relative group border-secondary-200",
-          overLimit && "border-l-4 border-l-red-500",
-          !overLimit && wordCount === 0 && "border-l-4 border-l-amber-500",
-          !overLimit && wordCount > 0 && "border-l-4 border-l-primary-500"
+          "card p-6 hover-lift cursor-pointer group relative overflow-hidden transition-all duration-300",
+          "border-l-4",
+          overLimit ? "border-l-danger-500" :
+          wordCount === 0 ? "border-l-warning-500" :
+          "border-l-electric-500"
         )}
         onClick={() => setExpanded(true)}
       >
-        <div className="flex justify-between items-start mb-4">
-          <h3 className="text-lg font-bold text-secondary-900 pr-8 leading-tight">{response.title}</h3>
-          <button
-            onClick={handleCopy}
-            className={cn(
-              "absolute top-4 right-4 p-2 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100",
-              copied ? "bg-primary-100 text-primary-700" : "bg-secondary-100 text-secondary-600 hover:bg-secondary-200"
-            )}
-            title="Copy to clipboard"
-          >
-            {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
-          </button>
-        </div>
+        {/* Subtle hover gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-electric-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        <div className="mb-4">
-          <div className="flex justify-between text-xs font-medium text-secondary-500 mb-1.5">
-            <span>{limitText}</span>
-            {percentage > 0 && <span>{percentage.toFixed(1)}%</span>}
+        <div className="relative">
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-lg font-bold text-secondary-900 pr-10 leading-tight tracking-tight">{response.title}</h3>
+            <button
+              onClick={handleCopy}
+              className={cn(
+                "absolute top-0 right-0 p-2.5 rounded-xl transition-all duration-200",
+                "opacity-0 group-hover:opacity-100 transform group-hover:translate-x-0 translate-x-2",
+                copied
+                  ? "bg-success-500/10 text-success-600"
+                  : "bg-midnight-100 text-midnight-500 hover:bg-midnight-200 hover:text-midnight-700"
+              )}
+              title="Copy to clipboard"
+            >
+              {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
+            </button>
           </div>
-          {percentage > 0 && (
-            <div className="h-1.5 w-full bg-secondary-100 rounded-full overflow-hidden">
-              <div
-                className={`h-full ${progressBarColor} transition-all duration-500 rounded-full`}
-                style={{ width: `${Math.min(percentage, 100)}%` }}
-              />
-            </div>
-          )}
-        </div>
 
-        <div className={cn(
-          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border",
-          overLimit ? 'text-red-700 bg-red-50 border-red-200' :
-          wordCount === 0 ? 'text-amber-700 bg-amber-50 border-amber-200' :
-          'text-primary-700 bg-primary-50 border-primary-200'
-        )}>
-          {overLimit ? <AlertTriangle size={14} /> : wordCount === 0 ? <Circle size={14} /> : <CheckCircle size={14} />}
-          <span className="capitalize">{overLimit ? 'Over Limit' : wordCount === 0 ? 'Empty' : 'Draft'}</span>
+          <div className="mb-4">
+            <div className="flex justify-between text-xs font-medium text-secondary-500 mb-2">
+              <span className="font-mono">{limitText}</span>
+              {percentage > 0 && (
+                <span className={cn(
+                  "font-semibold",
+                  percentage > 100 ? "text-danger-600" :
+                  percentage > 80 ? "text-warning-600" :
+                  "text-electric-600"
+                )}>
+                  {percentage.toFixed(0)}%
+                </span>
+              )}
+            </div>
+            {percentage > 0 && (
+              <div className="progress-bar">
+                <div
+                  className={cn("progress-bar-fill", getProgressStyle())}
+                  style={{ width: `${Math.min(percentage, 100)}%` }}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className={cn("badge", getStatusStyle())}>
+            {overLimit ? <AlertTriangle size={12} /> : wordCount === 0 ? <Circle size={12} /> : <CheckCircle size={12} />}
+            <span>{overLimit ? 'Over Limit' : wordCount === 0 ? 'Empty' : 'Draft'}</span>
+          </div>
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal - Redesigned */}
       {expanded && (
-        <div className="fixed inset-0 bg-secondary-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => { setExpanded(false); setEditing(false) }}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in" onClick={e => e.stopPropagation()}>
-            <div className="p-6 border-b border-secondary-100 flex justify-between items-center sticky top-0 bg-white z-10">
-              <h2 className="text-xl font-bold text-secondary-900">{response.title}</h2>
+        <div className="modal-backdrop" onClick={() => { setExpanded(false); setEditing(false) }}>
+          <div className="modal-content w-full max-w-4xl max-h-[90vh] flex flex-col mx-4" onClick={e => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="p-6 border-b border-midnight-100 flex justify-between items-center sticky top-0 bg-white z-10">
+              <div>
+                <h2 className="text-xl font-bold text-secondary-900 tracking-tight">{response.title}</h2>
+                <div className={cn("badge mt-2", getStatusStyle())}>
+                  {overLimit ? <AlertTriangle size={12} /> : wordCount === 0 ? <Circle size={12} /> : <CheckCircle size={12} />}
+                  <span>{overLimit ? 'Over Limit' : wordCount === 0 ? 'Empty' : 'Draft'}</span>
+                </div>
+              </div>
               <div className="flex gap-2">
                 {!editing && (
                   <button
                     onClick={() => setEditing(true)}
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
+                    className="btn btn-primary"
                   >
+                    <Edit3 size={16} />
                     Edit
                   </button>
                 )}
-                <button onClick={() => { setExpanded(false); setEditing(false) }} className="text-secondary-400 hover:text-secondary-600 p-2 rounded-full hover:bg-secondary-50 transition-colors">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                <button
+                  onClick={() => { setExpanded(false); setEditing(false) }}
+                  className="p-2.5 rounded-xl text-midnight-400 hover:text-midnight-600 hover:bg-midnight-100 transition-colors"
+                >
+                  <X size={20} />
                 </button>
               </div>
             </div>
 
-            <div className="p-6 overflow-y-auto custom-scrollbar bg-secondary-50/50 flex-1">
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto custom-scrollbar bg-midnight-50/50 flex-1">
+              {/* Question prompt */}
               {response.question && (
-                <div className="bg-primary-50 border-l-4 border-primary-500 p-5 mb-6 rounded-r-lg shadow-sm">
-                  <h4 className="font-bold text-primary-800 mb-2 uppercase text-xs tracking-wider">Question</h4>
-                  <p className="text-primary-900 leading-relaxed">{response.question}</p>
+                <div className="relative mb-6 p-5 rounded-xl overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-electric-500/10 to-transparent" />
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-electric-500" />
+                  <div className="relative">
+                    <h4 className="font-bold text-electric-700 mb-2 uppercase text-xs tracking-wider flex items-center gap-2">
+                      <FileText size={12} />
+                      Question
+                    </h4>
+                    <p className="text-midnight-700 leading-relaxed">{response.question}</p>
+                  </div>
                 </div>
               )}
 
-              <div className="flex items-center gap-4 mb-6 bg-white p-4 rounded-xl border border-secondary-200 shadow-sm">
-                <div className="flex-1">
-                  <div className="flex justify-between text-sm font-medium text-secondary-600 mb-2">
-                    <span>{limitText}</span>
-                    <span>{percentage.toFixed(1)}%</span>
-                  </div>
-                  {percentage > 0 && (
-                    <div className="h-2 w-full bg-secondary-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full ${progressBarColor} rounded-full`}
-                        style={{ width: `${Math.min(percentage, 100)}%` }}
-                      />
+              {/* Progress bar and copy button */}
+              <div className="card p-4 mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <div className="flex justify-between text-sm font-medium text-secondary-600 mb-2">
+                      <span className="font-mono">{limitText}</span>
+                      <span className={cn(
+                        "font-semibold",
+                        percentage > 100 ? "text-danger-600" :
+                        percentage > 80 ? "text-warning-600" :
+                        "text-electric-600"
+                      )}>
+                        {percentage.toFixed(1)}%
+                      </span>
                     </div>
-                  )}
+                    {percentage > 0 && (
+                      <div className="progress-bar">
+                        <div
+                          className={cn("progress-bar-fill", getProgressStyle())}
+                          style={{ width: `${Math.min(percentage, 100)}%` }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleCopy}
+                    className={cn(
+                      "btn transition-all active:scale-95",
+                      copied ? "btn-electric" : "btn-primary"
+                    )}
+                  >
+                    {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
+                    {copied ? 'Copied!' : 'Copy'}
+                  </button>
                 </div>
-                <button
-                  onClick={handleCopy}
-                  className={cn(
-                    "flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold transition-all shadow-sm active:scale-95",
-                    copied ? "bg-green-600 text-white" : "bg-primary-600 text-white hover:bg-primary-700"
-                  )}
-                >
-                  {copied ? <CheckCircle size={18} /> : <Copy size={18} />}
-                  {copied ? 'Copied!' : 'Copy'}
-                </button>
               </div>
 
+              {/* Content area */}
               {editing ? (
                 <div className="space-y-4">
                   <textarea
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="w-full h-96 p-4 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none font-sans text-base"
+                    className="input h-96 resize-none font-mono text-sm"
                     placeholder="Enter your response..."
+                    autoFocus
                   />
                   <div className="flex justify-end gap-3">
                     <button
                       onClick={() => { setContent(response.content || ''); setEditing(false) }}
-                      className="px-4 py-2 border border-secondary-300 text-secondary-700 rounded-lg font-medium hover:bg-secondary-50"
+                      className="btn btn-secondary"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSave}
-                      className="px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700"
+                      className="btn btn-electric"
                     >
-                      Save
+                      <Save size={16} />
+                      Save Changes
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="prose prose-slate max-w-none bg-white p-8 rounded-xl border border-secondary-200 shadow-sm">
-                  <div className="whitespace-pre-wrap font-sans text-base text-secondary-800 leading-relaxed">
-                    {content || <span className="text-secondary-400 italic">No content yet. Click Edit to add your response.</span>}
+                <div className="card p-8">
+                  <div className="prose prose-slate max-w-none">
+                    <div className="whitespace-pre-wrap text-base text-secondary-700 leading-relaxed">
+                      {content || <span className="text-secondary-400 italic">No content yet. Click Edit to add your response.</span>}
+                    </div>
                   </div>
                 </div>
               )}
@@ -2250,6 +2365,7 @@ function LoginPage() {
 }
 
 // Authenticated app content
+// Authenticated App - Redesigned with Technical Editorial aesthetic
 function AuthenticatedApp({ session, onSignOut }) {
   const [grants, setGrants] = useState([])
   const [showArchived, setShowArchived] = useState(false)
@@ -2281,55 +2397,63 @@ function AuthenticatedApp({ session, onSignOut }) {
   const defaultGrant = grants.length > 0 ? grants[0].id : null
 
   return (
-    <div className="min-h-screen bg-secondary-50 font-sans text-secondary-900 flex">
+    <div className="min-h-screen hero-gradient text-secondary-900 flex">
       {/* Mobile Header */}
-      <header className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-secondary-200 z-30 px-4 py-3 flex items-center justify-between">
+      <header className="md:hidden fixed top-0 left-0 right-0 glass border-b border-midnight-100/50 z-30 px-4 py-3 flex items-center justify-between">
         <button
           onClick={() => setMobileMenuOpen(true)}
-          className="p-2 -ml-2 text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100 rounded-lg"
+          className="p-2 -ml-2 text-midnight-600 hover:text-midnight-900 hover:bg-midnight-100 rounded-xl transition-colors"
         >
           <Menu size={24} />
         </button>
         <a href="https://grantkit.io" className="flex items-center gap-2">
-          <img src="/logo-icon.jpeg" alt="GrantKit" className="h-8 w-auto" />
-          <span className="font-bold text-secondary-900">GrantKit</span>
+          <img src="/logo-icon.jpeg" alt="GrantKit" className="h-8 w-auto rounded-lg" />
+          <span className="font-bold text-midnight-900 tracking-tight">GrantKit</span>
         </a>
-        <div className="w-10" /> {/* Spacer for centering */}
+        <div className="w-10" />
       </header>
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          className="md:hidden fixed inset-0 bg-midnight-900/60 backdrop-blur-sm z-40"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
       {/* Mobile Slide-out Menu */}
       <aside className={cn(
-        "md:hidden fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-50 transform transition-transform duration-300 overflow-y-auto",
+        "md:hidden fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-50 transform transition-transform duration-300 overflow-y-auto shadow-2xl",
         mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="p-4 border-b border-secondary-100 flex items-center justify-between">
-          <a href="https://grantkit.io" className="flex items-center gap-2">
-            <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto" />
-            <span className="text-xl font-bold text-secondary-900">GrantKit</span>
+        <div className="p-5 border-b border-midnight-100 flex items-center justify-between sidebar-brand">
+          <a href="https://grantkit.io" className="flex items-center gap-3">
+            <div className="relative">
+              <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto rounded-xl" />
+              <div className="absolute -inset-1 bg-electric-500/20 rounded-xl blur-lg -z-10" />
+            </div>
+            <span className="text-xl font-bold text-midnight-900 tracking-tight">GrantKit</span>
           </a>
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="p-2 text-secondary-500 hover:text-secondary-900"
+            className="p-2 text-midnight-400 hover:text-midnight-600 hover:bg-midnight-100 rounded-xl transition-colors"
           >
             <X size={24} />
           </button>
         </div>
-        <div className="p-4 border-b border-secondary-100">
-          <p className="text-xs text-secondary-500 font-semibold tracking-wider uppercase mb-3">Grant Applications</p>
-          <div className="flex gap-2">
+        <div className="p-4 border-b border-midnight-100">
+          <p className="text-xs text-midnight-500 font-semibold tracking-wider uppercase mb-3 flex items-center gap-2">
+            <FolderOpen size={12} />
+            Grant Applications
+          </p>
+          <div className="flex gap-2 p-1 bg-midnight-100 rounded-xl">
             <button
               onClick={() => setShowArchived(false)}
               className={cn(
-                "flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
-                !showArchived ? "bg-primary-100 text-primary-700" : "text-secondary-500 hover:bg-secondary-100"
+                "flex-1 px-4 py-2 text-xs font-medium rounded-lg transition-all",
+                !showArchived
+                  ? "bg-white text-midnight-900 shadow-sm"
+                  : "text-midnight-500 hover:text-midnight-700"
               )}
             >
               Active
@@ -2337,44 +2461,50 @@ function AuthenticatedApp({ session, onSignOut }) {
             <button
               onClick={() => setShowArchived(true)}
               className={cn(
-                "flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
-                showArchived ? "bg-primary-100 text-primary-700" : "text-secondary-500 hover:bg-secondary-100"
+                "flex-1 px-4 py-2 text-xs font-medium rounded-lg transition-all",
+                showArchived
+                  ? "bg-white text-midnight-900 shadow-sm"
+                  : "text-midnight-500 hover:text-midnight-700"
               )}
             >
+              <Archive size={12} className="inline mr-1" />
               Archived
             </button>
           </div>
         </div>
-        <nav className="p-3">
-          {grants.map((grant) => (
+        <nav className="p-3 space-y-1">
+          {grants.map((grant, index) => (
             <NavLink
               key={grant.id}
               to={`/${grant.id}`}
               onClick={() => setMobileMenuOpen(false)}
               className={({ isActive }) =>
                 cn(
-                  "block px-3 py-2.5 rounded-lg text-sm transition-all",
-                  isActive ? "bg-primary-50 text-primary-800 font-semibold" : "text-secondary-600"
+                  "block px-4 py-3 rounded-xl text-sm transition-all animate-fade-in",
+                  isActive
+                    ? "bg-white text-midnight-900 font-medium shadow-md"
+                    : "text-midnight-600 hover:bg-midnight-50"
                 )
               }
+              style={{ animationDelay: `${index * 50}ms` }}
             >
-              <div className="truncate">{grant.name}</div>
-              <div className="text-xs text-secondary-400">{grant.foundation}</div>
+              <div className="truncate font-medium">{grant.name}</div>
+              <div className="text-xs text-midnight-400 mt-0.5 truncate">{grant.foundation}</div>
             </NavLink>
           ))}
         </nav>
-        <div className="p-4 border-t border-secondary-100 mt-auto">
+        <div className="p-4 border-t border-midnight-100 mt-auto bg-midnight-50/50">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 bg-secondary-200 rounded-full flex items-center justify-center">
-              <User size={16} className="text-secondary-600" />
+            <div className="w-9 h-9 bg-gradient-to-br from-electric-500/20 to-electric-500/5 rounded-xl flex items-center justify-center border border-electric-500/20">
+              <User size={16} className="text-electric-600" />
             </div>
-            <div className="flex-1 min-w-0 text-sm text-secondary-900 truncate">
+            <div className="flex-1 min-w-0 text-sm text-midnight-700 truncate font-medium">
               {session.user.email}
             </div>
           </div>
           <button
             onClick={onSignOut}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-secondary-600 hover:bg-secondary-100 rounded-lg text-sm"
+            className="w-full btn btn-ghost text-sm"
           >
             <LogOut size={16} /> Sign out
           </button>
@@ -2382,25 +2512,31 @@ function AuthenticatedApp({ session, onSignOut }) {
       </aside>
 
       {/* Desktop Sidebar */}
-      <aside className="w-80 bg-white border-r border-secondary-200 h-screen fixed overflow-y-auto hidden md:flex flex-col z-20 shadow-sm">
-        <div className="p-6 border-b border-secondary-100 sticky top-0 bg-white/95 backdrop-blur z-10">
+      <aside className="w-80 h-screen fixed overflow-y-auto hidden md:flex flex-col z-20 border-r border-midnight-100 bg-white/80 backdrop-blur-xl">
+        <div className="p-6 border-b border-midnight-100 sticky top-0 bg-white/95 backdrop-blur z-10 sidebar-brand">
           <a
             href="https://grantkit.io"
-            className="flex items-center gap-3 mb-1 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-3 mb-4 hover:opacity-80 transition-opacity"
             title="GrantKit home"
           >
-            <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto" />
-            <span className="text-xl font-bold text-secondary-900">GrantKit</span>
+            <div className="relative">
+              <img src="/logo-icon.jpeg" alt="GrantKit" className="h-10 w-auto rounded-xl" />
+              <div className="absolute -inset-1 bg-electric-500/20 rounded-xl blur-lg -z-10" />
+            </div>
+            <span className="text-xl font-bold text-midnight-900 tracking-tight">GrantKit</span>
           </a>
-          <p className="text-xs text-secondary-500 font-semibold tracking-wider uppercase ml-1">Grant Applications</p>
-          <div className="flex gap-2 mt-3">
+          <p className="text-xs text-midnight-500 font-semibold tracking-wider uppercase mb-3 flex items-center gap-2">
+            <FolderOpen size={12} />
+            Grant Applications
+          </p>
+          <div className="flex gap-2 p-1 bg-midnight-100 rounded-xl">
             <button
               onClick={() => setShowArchived(false)}
               className={cn(
-                "flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
+                "flex-1 px-4 py-2 text-xs font-medium rounded-lg transition-all",
                 !showArchived
-                  ? "bg-primary-100 text-primary-700"
-                  : "text-secondary-500 hover:bg-secondary-100"
+                  ? "bg-white text-midnight-900 shadow-sm"
+                  : "text-midnight-500 hover:text-midnight-700"
               )}
             >
               Active
@@ -2408,59 +2544,75 @@ function AuthenticatedApp({ session, onSignOut }) {
             <button
               onClick={() => setShowArchived(true)}
               className={cn(
-                "flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
+                "flex-1 px-4 py-2 text-xs font-medium rounded-lg transition-all",
                 showArchived
-                  ? "bg-primary-100 text-primary-700"
-                  : "text-secondary-500 hover:bg-secondary-100"
+                  ? "bg-white text-midnight-900 shadow-sm"
+                  : "text-midnight-500 hover:text-midnight-700"
               )}
             >
+              <Archive size={12} className="inline mr-1" />
               Archived
             </button>
           </div>
         </div>
 
-        <nav className="p-3 flex-1">
-          {grants.map((grant) => (
+        <nav className="p-3 flex-1 space-y-1 overflow-y-auto scrollbar-hide">
+          {grants.map((grant, index) => (
             <NavLink
               key={grant.id}
               to={`/${grant.id}`}
               className={({ isActive }) =>
                 cn(
-                  "block px-3 py-2.5 rounded-lg text-sm transition-all duration-200 group border border-transparent",
+                  "block px-4 py-3 rounded-xl text-sm transition-all duration-200 group animate-fade-in",
                   isActive
-                    ? "bg-primary-50 text-primary-800 font-semibold shadow-sm border-primary-100"
-                    : "text-secondary-600 hover:bg-secondary-50 hover:text-secondary-900"
+                    ? "bg-white text-midnight-900 font-medium shadow-md border border-midnight-100"
+                    : "text-midnight-600 hover:bg-midnight-50 hover:text-midnight-900"
                 )
               }
+              style={{ animationDelay: `${index * 50}ms` }}
             >
-              <div className="truncate leading-snug">{grant.name}</div>
-              <div className="text-xs mt-0.5 truncate text-secondary-400 group-hover:text-secondary-500">
-                {grant.foundation}
+              <div className="flex items-start gap-3">
+                <div className={cn(
+                  "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors",
+                  "bg-midnight-100 text-midnight-500 group-hover:bg-electric-500/10 group-hover:text-electric-600"
+                )}>
+                  <FileText size={14} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="truncate font-medium leading-snug">{grant.name}</div>
+                  <div className="text-xs mt-0.5 truncate text-midnight-400 group-hover:text-midnight-500">
+                    {grant.foundation}
+                  </div>
+                </div>
               </div>
             </NavLink>
           ))}
 
           {grants.length === 0 && (
-            <div className="text-center py-8 text-secondary-400">
-              <p className="text-sm">No grants yet</p>
+            <div className="text-center py-12 text-midnight-400">
+              <div className="w-12 h-12 rounded-2xl bg-midnight-100 flex items-center justify-center mx-auto mb-3">
+                <FolderOpen size={24} className="text-midnight-300" />
+              </div>
+              <p className="text-sm font-medium">No grants yet</p>
+              <p className="text-xs text-midnight-300 mt-1">Create one to get started</p>
             </div>
           )}
         </nav>
 
-        <div className="p-4 border-t border-secondary-100 bg-secondary-50/50">
+        <div className="p-4 border-t border-midnight-100 bg-midnight-50/50">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 bg-secondary-200 rounded-full flex items-center justify-center">
-              <User size={16} className="text-secondary-600" />
+            <div className="w-9 h-9 bg-gradient-to-br from-electric-500/20 to-electric-500/5 rounded-xl flex items-center justify-center border border-electric-500/20">
+              <User size={16} className="text-electric-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-secondary-900 truncate">
+              <div className="text-sm font-medium text-midnight-700 truncate">
                 {session.user.email}
               </div>
             </div>
           </div>
           <button
             onClick={onSignOut}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100 rounded-lg transition-colors text-sm font-medium"
+            className="w-full btn btn-ghost text-sm"
           >
             <LogOut size={16} />
             Sign out
@@ -2472,7 +2624,15 @@ function AuthenticatedApp({ session, onSignOut }) {
       <main className="flex-1 md:ml-80 min-h-screen pt-16 md:pt-0">
         <div className="max-w-7xl mx-auto p-6 md:p-10 lg:p-12">
           <Routes>
-            <Route path="/" element={defaultGrant ? <Navigate to={`/${defaultGrant}`} replace /> : <div className="text-center py-20 text-secondary-400">No grants yet</div>} />
+            <Route path="/" element={defaultGrant ? <Navigate to={`/${defaultGrant}`} replace /> : (
+              <div className="text-center py-24">
+                <div className="w-16 h-16 rounded-2xl bg-midnight-100 flex items-center justify-center mx-auto mb-4">
+                  <FolderOpen size={32} className="text-midnight-300" />
+                </div>
+                <p className="text-lg font-medium text-midnight-500">No grants yet</p>
+                <p className="text-midnight-400 mt-1">Create your first grant to get started</p>
+              </div>
+            )} />
             <Route path="/:grantId" element={<GrantDetail onArchive={handleArchive} onRestore={handleRestore} showArchived={showArchived} />} />
           </Routes>
         </div>
