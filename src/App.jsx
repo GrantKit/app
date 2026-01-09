@@ -2907,8 +2907,8 @@ function App() {
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-200 border-t-primary-600"></div>
             </div>
           ) : !session ? (
-            // Not logged in - show landing page
-            <LandingPage />
+            // Not logged in - show simple login (landing page is on grantkit.io)
+            <LoginPage />
           ) : !isAllowedEmail(session.user?.email) ? (
             // Non-PolicyEngine users see waitlist
             <WaitlistPage email={session.user?.email} onSignOut={handleSignOut} />
