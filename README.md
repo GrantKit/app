@@ -1,16 +1,43 @@
-# React + Vite
+# GrantKit App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The web application for GrantKit - manage and sync grant proposals with your local file system.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Google OAuth** - Sign in with your Google account
+- **Grant management** - Create, edit, and track grant proposals
+- **Collaboration** - Share grants with team members
+- **Sync** - Two-way sync between web and local markdown files
 
-## React Compiler
+## Tech stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + Vite
+- Supabase (auth + database)
+- TailwindCSS
 
-## Expanding the ESLint configuration
+## Development
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+# Install dependencies
+bun install
+
+# Start dev server
+bun run dev
+
+# Build for production
+bun run build
+```
+
+## Environment variables
+
+Copy `.env.example` to `.env` and configure:
+
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+## Related repos
+
+- [grantkit](https://github.com/GrantKit/grantkit) - Python CLI for local sync
+- [website](https://github.com/GrantKit/website) - Marketing site at grantkit.io
