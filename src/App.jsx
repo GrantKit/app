@@ -465,9 +465,37 @@ function LandingPage() {
   )
 }
 
+// Helper to strip markdown formatting for plain text copy
+const stripMarkdown = (text) => {
+  return text
+    // Remove headers
+    .replace(/^#{1,6}\s+/gm, '')
+    // Remove bold/italic
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/__([^_]+)__/g, '$1')
+    .replace(/_([^_]+)_/g, '$1')
+    // Remove links, keep text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    // Remove inline code
+    .replace(/`([^`]+)`/g, '$1')
+    // Remove code blocks
+    .replace(/```[\s\S]*?```/g, '')
+    // Remove blockquotes
+    .replace(/^>\s+/gm, '')
+    // Remove horizontal rules
+    .replace(/^---+$/gm, '')
+    // Remove list markers
+    .replace(/^[\*\-]\s+/gm, '')
+    .replace(/^\d+\.\s+/gm, '')
+    // Clean up multiple newlines
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 // Response card component - Redesigned with Technical Editorial aesthetic
-function ResponseCard({ response, onUpdate }) {
-  const [copied, setCopied] = useState(false)
+function ResponseCard({ response, onUpdate, acceptsMarkdown = true }) {
+  const [copiedMode, setCopiedMode] = useState(null)  // 'text' or 'markdown'
   const [expanded, setExpanded] = useState(false)
   const [editing, setEditing] = useState(false)
   const [content, setContent] = useState(response.content || '')
@@ -479,12 +507,33 @@ function ResponseCard({ response, onUpdate }) {
   const overLimit = (response.word_limit && wordCount > response.word_limit) ||
                    (response.char_limit && charCount > response.char_limit)
 
-  const handleCopy = async (e) => {
+  const handleCopyText = async (e) => {
+    e.stopPropagation()
+    const plainText = stripMarkdown(content)
+    const success = await copyToClipboard(plainText)
+    if (success) {
+      setCopiedMode('text')
+      setTimeout(() => setCopiedMode(null), 2000)
+    }
+  }
+
+  const handleCopyMarkdown = async (e) => {
     e.stopPropagation()
     const success = await copyToClipboard(content)
     if (success) {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      setCopiedMode('markdown')
+      setTimeout(() => setCopiedMode(null), 2000)
+    }
+  }
+
+  // Card button - copies as text for text-only grants, markdown otherwise
+  const handleCopy = async (e) => {
+    e.stopPropagation()
+    const textToCopy = acceptsMarkdown ? content : stripMarkdown(content)
+    const success = await copyToClipboard(textToCopy)
+    if (success) {
+      setCopiedMode(acceptsMarkdown ? 'markdown' : 'text')
+      setTimeout(() => setCopiedMode(null), 2000)
     }
   }
 
@@ -538,13 +587,13 @@ function ResponseCard({ response, onUpdate }) {
               className={cn(
                 "absolute top-0 right-0 p-2.5 rounded-xl transition-all duration-200",
                 "opacity-0 group-hover:opacity-100 transform group-hover:translate-x-0 translate-x-2",
-                copied
+                copiedMode
                   ? "bg-success-500/10 text-success-600"
                   : "bg-midnight-100 text-midnight-500 hover:bg-midnight-200 hover:text-midnight-700"
               )}
-              title="Copy to clipboard"
+              title={acceptsMarkdown ? "Copy as markdown" : "Copy as plain text"}
             >
-              {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
+              {copiedMode ? <CheckCircle size={16} /> : <Copy size={16} />}
             </button>
           </div>
 
@@ -628,7 +677,7 @@ function ResponseCard({ response, onUpdate }) {
                 </div>
               )}
 
-              {/* Progress bar and copy button */}
+              {/* Progress bar and copy buttons */}
               <div className="card p-4 mb-6">
                 <div className="flex items-center gap-4">
                   <div className="flex-1">
@@ -652,17 +701,39 @@ function ResponseCard({ response, onUpdate }) {
                       </div>
                     )}
                   </div>
-                  <button
-                    onClick={handleCopy}
-                    className={cn(
-                      "btn transition-all active:scale-95",
-                      copied ? "btn-electric" : "btn-primary"
-                    )}
-                  >
-                    {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
-                    {copied ? 'Copied!' : 'Copy'}
-                  </button>
+                  {/* Copy buttons - always show both for flexibility */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleCopyText}
+                      className={cn(
+                        "btn transition-all active:scale-95",
+                        copiedMode === 'text' ? "btn-electric" : "btn-secondary"
+                      )}
+                      title="Copy as plain text (strips formatting)"
+                    >
+                      {copiedMode === 'text' ? <CheckCircle size={16} /> : <Copy size={16} />}
+                      {copiedMode === 'text' ? 'Copied!' : 'Copy'}
+                    </button>
+                    <button
+                      onClick={handleCopyMarkdown}
+                      className={cn(
+                        "btn transition-all active:scale-95",
+                        copiedMode === 'markdown' ? "btn-electric" : "btn-primary"
+                      )}
+                      title="Copy with markdown formatting"
+                    >
+                      {copiedMode === 'markdown' ? <CheckCircle size={16} /> : <Code2 size={16} />}
+                      {copiedMode === 'markdown' ? 'Copied!' : 'Copy MD'}
+                    </button>
+                  </div>
                 </div>
+                {/* Hint for text-only grants */}
+                {!acceptsMarkdown && (
+                  <p className="text-xs text-warning-600 mt-2 flex items-center gap-1">
+                    <AlertTriangle size={12} />
+                    This grant only accepts plain text. Use "Copy" for the submission portal.
+                  </p>
+                )}
               </div>
 
               {/* Content area */}
@@ -693,10 +764,12 @@ function ResponseCard({ response, onUpdate }) {
                 </div>
               ) : (
                 <div className="card p-8">
-                  <div className="prose prose-slate max-w-none">
-                    <div className="whitespace-pre-wrap text-base text-secondary-700 leading-relaxed">
-                      {content || <span className="text-secondary-400 italic">No content yet. Click Edit to add your response.</span>}
-                    </div>
+                  <div className="prose prose-slate max-w-none prose-headings:font-bold prose-headings:text-secondary-900 prose-p:text-secondary-700 prose-p:leading-relaxed prose-strong:text-secondary-800 prose-ul:text-secondary-700 prose-ol:text-secondary-700">
+                    {content ? (
+                      <ReactMarkdown>{content}</ReactMarkdown>
+                    ) : (
+                      <span className="text-secondary-400 italic">No content yet. Click Edit to add your response.</span>
+                    )}
                   </div>
                 </div>
               )}
@@ -2084,7 +2157,12 @@ function GrantDetail({ onArchive, onRestore, showArchived }) {
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {responses.map((response) => (
-              <ResponseCard key={response.id} response={response} onUpdate={handleResponseUpdate} />
+              <ResponseCard
+                key={response.id}
+                response={response}
+                onUpdate={handleResponseUpdate}
+                acceptsMarkdown={grant.accepts_markdown !== false}
+              />
             ))}
           </div>
         </div>
