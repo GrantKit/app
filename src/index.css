@@ -288,7 +288,11 @@
 }
 
 .markdown-content p {
-  @apply mb-5;
+  @apply mb-6;
+}
+
+.markdown-content p + p {
+  @apply mt-4;
 }
 
 .markdown-content p:last-child {
