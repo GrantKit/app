@@ -186,6 +186,123 @@ describe('Copy to Clipboard Helper', () => {
   })
 })
 
+describe('stripMarkdown for plain text grants', () => {
+  // Import the function - we'll need to export it from App.jsx
+  // For now, replicate the logic here for testing
+  const stripMarkdown = (text) => {
+    return text
+      // Remove HTML comments
+      .replace(/<!--[\s\S]*?-->/g, '')
+      // Remove headers
+      .replace(/^#{1,6}\s+/gm, '')
+      // Remove bold/italic
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/__([^_]+)__/g, '$1')
+      .replace(/_([^_]+)_/g, '$1')
+      // Remove links, keep text
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // Remove inline code
+      .replace(/`([^`]+)`/g, '$1')
+      // Remove code blocks
+      .replace(/```[\s\S]*?```/g, '')
+      // Remove blockquotes
+      .replace(/^>\s+/gm, '')
+      // Remove horizontal rules
+      .replace(/^---+$/gm, '')
+      // Remove list markers
+      .replace(/^[\*\-]\s+/gm, '')
+      .replace(/^\d+\.\s+/gm, '')
+      // Remove table syntax (pipes and dashes)
+      .replace(/^\|.*\|$/gm, '')
+      .replace(/^[\|\-\:\s]+$/gm, '')
+      // Clean up multiple newlines
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+  }
+
+  it('removes HTML comments', () => {
+    const input = '<!-- This is a comment --> Some text'
+    expect(stripMarkdown(input)).toBe('Some text')
+  })
+
+  it('removes headers', () => {
+    const input = '## Header\nSome text'
+    expect(stripMarkdown(input)).toBe('Header\nSome text')
+  })
+
+  it('removes bold and italic', () => {
+    const input = '**bold** and *italic* text'
+    expect(stripMarkdown(input)).toBe('bold and italic text')
+  })
+
+  it('removes links but keeps text', () => {
+    const input = 'Check out [this link](https://example.com) for more'
+    expect(stripMarkdown(input)).toBe('Check out this link for more')
+  })
+
+  it('removes table syntax (pipes)', () => {
+    const input = '| Column 1 | Column 2 |\n|----------|----------|\n| Data 1 | Data 2 |'
+    const result = stripMarkdown(input)
+    expect(result).not.toContain('|')
+  })
+
+  it('removes table separator rows', () => {
+    const input = '|---|---|'
+    expect(stripMarkdown(input).trim()).toBe('')
+  })
+
+  it('removes blockquotes', () => {
+    const input = '> This is a quote\nNormal text'
+    expect(stripMarkdown(input)).toBe('This is a quote\nNormal text')
+  })
+
+  it('removes inline code backticks', () => {
+    const input = 'Use `code` here'
+    expect(stripMarkdown(input)).toBe('Use code here')
+  })
+
+  it('removes code blocks', () => {
+    const input = '```\nprint("hello")\n```\nAfter code'
+    const result = stripMarkdown(input)
+    // Code blocks should be removed, leaving only the text after
+    expect(result).not.toContain('```')
+    expect(result).toContain('After code')
+  })
+
+  it('removes list markers', () => {
+    const input = '- Item 1\n- Item 2\n1. Numbered'
+    expect(stripMarkdown(input)).toBe('Item 1\nItem 2\nNumbered')
+  })
+
+  it('handles complex real-world content', () => {
+    const input = `<!-- Methods section -->
+## Project Overview
+
+| Activity | Budget |
+|----------|--------|
+| Council Tax | £70k |
+
+**PolicyEngine** builds tools for [policy analysis](https://policyengine.org).`
+
+    const result = stripMarkdown(input)
+
+    // Should NOT contain any markdown syntax
+    expect(result).not.toContain('<!--')
+    expect(result).not.toContain('-->')
+    expect(result).not.toContain('##')
+    expect(result).not.toContain('|')
+    expect(result).not.toContain('**')
+    expect(result).not.toContain('[')
+    expect(result).not.toContain('](')
+
+    // Should contain the plain text
+    expect(result).toContain('Project Overview')
+    expect(result).toContain('PolicyEngine')
+    expect(result).toContain('policy analysis')
+  })
+})
+
 describe('Progress Bar Colors', () => {
   it('returns red for over 100%', () => {
     const percentage = 110

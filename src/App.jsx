@@ -490,6 +490,9 @@ const stripMarkdown = (text) => {
     // Remove list markers
     .replace(/^[\*\-]\s+/gm, '')
     .replace(/^\d+\.\s+/gm, '')
+    // Remove table syntax (pipes and separator rows)
+    .replace(/^\|.*\|$/gm, '')
+    .replace(/^[\|\-\:\s]+$/gm, '')
     // Clean up multiple newlines
     .replace(/\n{3,}/g, '\n\n')
     .trim()
@@ -2400,7 +2403,7 @@ function PublicGrantView() {
 }
 
 // Domain configuration
-const hostname = window.location.hostname
+const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost'
 const DEV_MODE = hostname === 'localhost'
 // Note: grantkit.io and app.grantkit.io both serve the app for now
 // TODO: Set up separate landing page at grantkit.io
