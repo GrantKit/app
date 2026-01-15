@@ -468,6 +468,8 @@ function LandingPage() {
 // Helper to strip markdown formatting for plain text copy
 const stripMarkdown = (text) => {
   return text
+    // Remove HTML comments
+    .replace(/<!--[\s\S]*?-->/g, '')
     // Remove headers
     .replace(/^#{1,6}\s+/gm, '')
     // Remove bold/italic
